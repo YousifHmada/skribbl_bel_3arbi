@@ -1,0 +1,25 @@
+{
+  "name": "skribbl_bel_3arbi",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "engines": {
+    "node": "12.x"
+  },
+  "scripts": {
+    "start": "node src/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/YousifHmada/skribbl_bel_3arbi.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/YousifHmada/skribbl_bel_3arbi/issues"
+  },
+  "homepage": "https://github.com/YousifHmada/skribbl_bel_3arbi#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
