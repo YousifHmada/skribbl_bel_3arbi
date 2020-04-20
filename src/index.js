@@ -1,8 +1,18 @@
+const fs = require('fs');
+const { connect: connectPlugins } = require('./plugins');
+const { init: initUseCases } = require('./use_cases');
 
-const express = require('express')
-const app = express()
-const port =  process.env.PORT || 3000
+function getConfig() {
+  const text = fs.readFileSync('config.json');
+  return JSON.parse(text);
+}
 
-app.get('/', (req, res) => res.send('Hello World!'))
+async function main() {
+  const context = {
+    config: getConfig(),
+  };
+  context.plugins = await connectPlugins(context);
+  context.useCases = initUseCases(context);
+}
 
-app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`))
+main();
