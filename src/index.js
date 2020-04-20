@@ -10,8 +10,9 @@ function getConfig() {
 async function main() {
   const context = {
     config: getConfig(),
+    plugins: {},
   };
-  context.plugins = await connectPlugins(context);
+  await connectPlugins(context);
   context.useCases = initUseCases(context);
 }
 
