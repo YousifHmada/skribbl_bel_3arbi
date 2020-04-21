@@ -16,11 +16,7 @@ function init(context) {
     next();
   });
 
-  app.get('/api', async (req, res) => {
-    res.send(await req.context.useCases.displayHelloWorld());
-  });
   app.use('/api', initRoomRoutes());
-
 
   // eslint-disable-next-line no-console
   const server = app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`));

@@ -1,6 +1,6 @@
 const fs = require('fs');
-const { connect: connectPlugins } = require('./plugins');
-const { init: initUseCases } = require('./use_cases');
+const { init: attachPlugins } = require('./plugins');
+const { init: attachUseCases } = require('./use_cases');
 
 function getConfig() {
   const text = fs.readFileSync('config.json');
@@ -12,8 +12,8 @@ async function main() {
     config: getConfig(),
     plugins: {},
   };
-  await connectPlugins(context);
-  context.useCases = initUseCases(context);
+  await attachPlugins(context);
+  attachUseCases(context);
 }
 
 main();

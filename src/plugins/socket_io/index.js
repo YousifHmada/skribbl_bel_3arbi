@@ -1,38 +1,35 @@
-const socket = require('socket.io');
+const socketIO = require('socket.io');
 
 function init(context) {
-  const io = socket(context.plugins.express.server);
-  io.sockets.on('connection', newConnection);
+  const io = socketIO(context.plugins.express.server);
+  io.sockets.on('connection', newConnectionHandler);
 
-  function newConnection(socket) {
+  function newConnectionHandler(socket) {
     const socketId = socket.id;
     const { userId } = socket.handshake.query;
 
+    // eslint-disable-next-line no-console
     console.log('new connection: ', socket.id);
 
     context.plugins.localStorage.set(userId, socketId);
 
-    socket.on('mouse', mouseMsg);
+    socket.on('mouseMovement', mouseMovementHandler);
+  }
 
-    function mouseMsg(data) {
-      io.sockets.in(data.roomId).emit('mouse', data);
-    }
+  function mouseMovementHandler(data) {
+    const { roomId } = data;
+    io.sockets.in(roomId).emit('mouseMoved', data);
   }
 
   function joinRoom(userId, roomId) {
     const socketId = context.plugins.localStorage.get(userId);
-    console.log(socketId);
     const socket = io.sockets.connected[socketId];
 
     socket.join(roomId);
     io.sockets.in(roomId).emit('playerJoined', { playerId: userId });
   }
 
-  function createRoom(roomId) {
-    io(roomId);
-  }
-
-  return { createRoom, joinRoom };
+  return { joinRoom };
 }
 
 

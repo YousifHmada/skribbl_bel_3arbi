@@ -1,6 +1,7 @@
 function init() {
   const map = new Map();
   function logMap() {
+    // eslint-disable-next-line no-console
     console.log(map.keys());
   }
 
