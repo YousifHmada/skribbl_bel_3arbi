@@ -9,10 +9,15 @@ function generateSlug(length) {
   return result;
 }
 
-function init() {
+function init(context) {
   return async function createRoom() {
-    const roomId = await generateSlug(10);
-    // @TODO check the room id if exists in the db or not
+    let roomId;
+    do {
+      roomId = generateSlug(10);
+    } while (context.plugins.socketIO.hasRoom(roomId));
+
+    await context.plugins.socketIO.createRoom(roomId);
+
     return roomId;
   };
 }

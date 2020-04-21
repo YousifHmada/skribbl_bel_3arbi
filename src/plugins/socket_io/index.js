@@ -1,35 +1,42 @@
+/* eslint-disable no-console */
 const socketIO = require('socket.io');
 
 function init(context) {
   const io = socketIO(context.plugins.express.server);
-  io.sockets.on('connection', newConnectionHandler);
 
-  function newConnectionHandler(socket) {
-    const socketId = socket.id;
-    const { userId } = socket.handshake.query;
+  function createRoom(roomId) {
+    const roomNsp = io.of(`/${roomId}`);
+    console.log(`Room : ${roomId} created!`);
 
-    // eslint-disable-next-line no-console
-    console.log('new connection: ', socket.id);
+    roomNsp.on('connection', onPlayerConnected);
 
-    context.plugins.localStorage.set(userId, socketId);
+    function getNumPlayers() {
+      return Object.keys(roomNsp.sockets).length;
+    }
 
-    socket.on('mouseMovement', mouseMovementHandler);
+    function onPlayerConnected(socket) {
+      console.log('playerConnected', { numPlayers: getNumPlayers() });
+      socket.broadcast.emit('playerConnected', { numPlayers: getNumPlayers() });
+
+      socket.on('disconnect', onPlayerDisconnected);
+
+      function onPlayerDisconnected() {
+        console.log('playerDisconnected', { numPlayers: getNumPlayers() });
+        socket.broadcast.emit('playerDisconnected', { numPlayers: getNumPlayers() });
+      }
+    }
   }
 
-  function mouseMovementHandler(data) {
-    const { roomId } = data;
-    io.sockets.in(roomId).emit('mouseMoved', data);
+  function deleteRoom(roomId) {
+    io.nsps[`/${roomId}`].removeAllListeners();
+    delete io.nsps[`/${roomId}`];
   }
 
-  function joinRoom(userId, roomId) {
-    const socketId = context.plugins.localStorage.get(userId);
-    const socket = io.sockets.connected[socketId];
-
-    socket.join(roomId);
-    io.sockets.in(roomId).emit('playerJoined', { playerId: userId });
+  function hasRoom(roomId) {
+    return io.nsps[`/${roomId}`] !== undefined;
   }
 
-  return { joinRoom };
+  return { createRoom, deleteRoom, hasRoom };
 }
 
 

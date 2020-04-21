@@ -11,6 +11,7 @@ async function main() {
   const context = {
     config: getConfig(),
     plugins: {},
+    useCases: {},
   };
   await attachPlugins(context);
   attachUseCases(context);

@@ -8,7 +8,6 @@ function init(context) {
   const app = express();
   const port = process.env.PORT || 3000;
   app.use(bodyParser.json());
-  app.use(express.static('public'));
 
   app.use(morgan(':method :url :status :res[content-length] - :response-time ms'));
 
@@ -17,7 +16,7 @@ function init(context) {
     next();
   });
 
-  app.use('/api', initRoomRoutes());
+  app.use('/', initRoomRoutes());
 
   const displayErrors = process.env.NODE_ENV === 'development';
   app.use(errorHandler.init(displayErrors));
