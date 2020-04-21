@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const initRoomRoutes = require('./routes/rooms');
+const errorHandler = require('./errorHandler');
 
 function init(context) {
   const app = express();
@@ -17,6 +18,9 @@ function init(context) {
   });
 
   app.use('/api', initRoomRoutes());
+
+  const displayErrors = process.env.NODE_ENV === 'development';
+  app.use(errorHandler.init(displayErrors));
 
   // eslint-disable-next-line no-console
   const server = app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`));

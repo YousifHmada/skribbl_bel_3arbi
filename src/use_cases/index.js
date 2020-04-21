@@ -7,7 +7,9 @@ function init(context) {
     host: { createRoom: createRoom.init(context) },
     player: { joinRoom: joinRoom.init(context) },
   };
-  useCases.forEach((key) => { context[key] = useCases[key]; });
+
+  Object.keys(useCases)
+    .forEach((key) => { context[key] = useCases[key]; });
 }
 
 module.exports = {
