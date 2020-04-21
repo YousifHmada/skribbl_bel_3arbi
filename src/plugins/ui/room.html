@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <script>
+        function getRoomIdFromWindow(){
+            const url = window.location.href
+            return url.split('rooms/')[1];
+        }
+        const roomId = getRoomIdFromWindow();
+        if (roomId) {
+            const socket = io(`/${roomId}`);
+            socket.on('playerConnected', data => {
+                console.log('playerConnected!', data);
+            })
+            socket.on('playerDisconnected', data => {
+                console.log('playerDisconnected!', data);
+            })
+        }
+    </script>
+</body>
+</html>

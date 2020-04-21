@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <button id="createRoomBtn">Create Room!</button>
+    <p>Room link : <a id="roomLink" href="#"></a></p>
+    <script>
+        const button = document.getElementById('createRoomBtn');
+        const roomLink = document.getElementById('roomLink');
+        button.addEventListener('click', createRoomBtnHandler);
+
+        function createRoomBtnHandler() {
+            button.removeEventListener('click', () => {});
+            console.log('request sent!')
+            fetch('/rooms', { method: 'post' })
+                .then((response) => {
+                    return response.json();
+                })
+                .then((data) => {
+                    roomLink.innerText = data.link;
+                    roomLink.href = data.link;
+                    button.addEventListener('click', createRoomBtnHandler);
+                })
+                .catch((data) => {
+                    button.addEventListener('click', createRoomBtnHandler);
+                });
+        }
+    </script>
+</body>
+
+</html>
