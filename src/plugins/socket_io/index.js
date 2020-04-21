@@ -15,14 +15,17 @@ function init(context) {
     }
 
     function onPlayerConnected(socket) {
-      console.log('playerConnected', { numPlayers: getNumPlayers() });
-      socket.broadcast.emit('playerConnected', { numPlayers: getNumPlayers() });
+      const player = {
+        nickname: socket.handshake.query.nickname,
+      };
+      console.log('playerConnected', { player, numPlayers: getNumPlayers() });
+      socket.broadcast.emit('playerConnected', { player, numPlayers: getNumPlayers() });
 
       socket.on('disconnect', onPlayerDisconnected);
 
       function onPlayerDisconnected() {
-        console.log('playerDisconnected', { numPlayers: getNumPlayers() });
-        socket.broadcast.emit('playerDisconnected', { numPlayers: getNumPlayers() });
+        console.log('playerDisconnected', { player, numPlayers: getNumPlayers() });
+        socket.broadcast.emit('playerDisconnected', { player, numPlayers: getNumPlayers() });
       }
     }
   }
