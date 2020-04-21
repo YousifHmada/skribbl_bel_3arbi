@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
-const initRoomRoutes = require('./routes/rooms');
+const initRoutes = require('./routes');
 const errorHandler = require('./errorHandler');
 
 function init(context) {
@@ -16,7 +16,7 @@ function init(context) {
     next();
   });
 
-  app.use('/', initRoomRoutes());
+  app.use('/', initRoutes());
 
   const displayErrors = process.env.NODE_ENV === 'development';
   app.use(errorHandler.init(displayErrors));
