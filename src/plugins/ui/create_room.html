@@ -12,6 +12,12 @@
         <span>Nickname : </span><input type="text" name="nickname" id="nicknameInput">
         <button id="tryAnotherNicknameBtn">Try Another Nickname!</button>
     </div>
+    <div class="settings">
+        <br>
+        <h2>Game Settings</h2>
+        <span>Number of Rounds : </span><input type="text" name="numRounds" id="numRoundsInput" value="3">
+        <span>Round Time : </span><input type="text" name="roundTime" id="roundTimeInput" value="100">     
+    </div>
     <div>
         <br>
         <button id="createRoomBtn">Create Room!</button>
@@ -59,8 +65,13 @@
         function createRoomBtnHandler() {
             createRoomBtn.removeEventListener('click', () => {});
             console.log('request sent!')
+            const body = { numRounds: document.getElementById('numRoundsInput').value,
+                    roundTime: document.getElementById('roundTimeInput').value
+                };
             fetch('/rooms', {
-                    method: 'post'
+                    method: 'post',
+                    body:    JSON.stringify(body),
+                    headers: { 'Content-Type': 'application/json' }
                 })
                 .then((response) => {
                     return response.json();
