@@ -42,7 +42,6 @@ function init(context) {
   return { createRoom, deleteRoom, hasRoom };
 }
 
-
 module.exports = {
   init,
 };
