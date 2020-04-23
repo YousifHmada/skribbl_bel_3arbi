@@ -19,5 +19,5 @@ function init({ displayErrors, context }) {
 }
 
 module.exports = {
-  init,
+  init
 };

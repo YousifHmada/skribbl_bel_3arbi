@@ -1,134 +1,145 @@
 const EventEmiiter = require('events');
 
-class Game {
-  constructor({ settings } = {}) {
-    this.players = [];
-    this.turn = 0;
-    this.state = 'created'; // States: created, running, finished
-    this.setSettings(settings);
-    this.timer = null;
-    this.eventEmitter = new EventEmiiter(); // Events: start, end, switchTurns
-  }
+function init() {
+  return class Game {
+    constructor({ settings } = {}) {
+      this.players = [];
+      this.turn = 0;
+      this.state = 'created'; // States: created, running, finished
+      this.setSettings(settings);
+      this.timer = null;
+      this.eventEmitter = new EventEmiiter(); // Events: start, end, switchTurns
+    }
 
-  on(...args) {
-    this.eventEmitter.on(...args);
-  }
+    on(...args) {
+      this.eventEmitter.on(...args);
+    }
 
-  off(...args) {
-    this.eventEmitter.off(...args);
-  }
+    off(...args) {
+      this.eventEmitter.off(...args);
+    }
 
-  setSettings({ rounds = 2, drawTime = 1 } = {}) {
-    if (this.state !== 'created') throw new Error('game should be in "created" state!');
-    this.rounds = rounds;
-    this.drawTime = drawTime;
-  }
+    setSettings({ rounds = 2, drawTime = 1 } = {}) {
+      if (this.state !== 'created') throw new Error('game should be in "created" state!');
+      this.rounds = rounds;
+      this.drawTime = drawTime;
+    }
 
-  addPlayer(player) {
-    this.players.push(player);
-  }
+    addPlayer(player) {
+      this.players.push(player);
+    }
 
-  removePlayer(player) {
-    const index = this.players.findIndex(
-      (currentPlayer) => currentPlayer === player,
-    );
-    if (index < 0) throw new Error();
-    this.players.splice(index, 1);
-    if (this.state === 'running') {
-      if (index < this.turn) {
-        this.turn -= 1;
-      } else if (index === this.turn) {
+    removePlayer(player) {
+      const index = this.players.findIndex((currentPlayer) => currentPlayer === player);
+      if (index < 0) throw new Error();
+      this.players.splice(index, 1);
+      if (this.state === 'running') {
+        if (index < this.turn) {
+          this.turn -= 1;
+        } else if (index === this.turn) {
+          this.resetTimer();
+          this.eventEmitter.emit('switchTurns', this.getPlayerInTurn());
+        }
+        if (!this.hasEnoughPlayers()) {
+          this.end();
+        }
+      }
+    }
+
+    hasAvailableRounds() {
+      return this.availableRounds > 0;
+    }
+
+    hasEnoughPlayers() {
+      return this.players.length > 1;
+    }
+
+    switchTurns() {
+      this.turn = (this.turn + 1) % this.players.length;
+    }
+
+    getPlayerInTurn() {
+      return this.players[this.turn];
+    }
+
+    onTimerEnd() {
+      if (this.turn + 1 >= this.players.length) {
+        this.availableRounds -= 1;
+      }
+      if (this.hasEnoughPlayers() && this.hasAvailableRounds()) {
+        this.switchTurns();
         this.resetTimer();
         this.eventEmitter.emit('switchTurns', this.getPlayerInTurn());
-      }
-      if (!this.hasEnoughPlayers()) {
+      } else {
         this.end();
       }
     }
-  }
 
-  hasAvailableRounds() {
-    return this.availableRounds > 0;
-  }
-
-  hasEnoughPlayers() {
-    return this.players.length > 1;
-  }
-
-  switchTurns() {
-    this.turn = (this.turn + 1) % this.players.length;
-  }
-
-  getPlayerInTurn() {
-    return this.players[this.turn];
-  }
-
-  onTimerEnd() {
-    if (this.turn + 1 >= this.players.length) {
-      this.availableRounds -= 1;
+    startTimer() {
+      this.timer = setTimeout(this.onTimerEnd.bind(this), this.drawTime * 1000);
     }
-    if (this.hasEnoughPlayers() && this.hasAvailableRounds()) {
-      this.switchTurns();
-      this.resetTimer();
-      this.eventEmitter.emit('switchTurns', this.getPlayerInTurn());
-    } else {
-      this.end();
+
+    resetTimer() {
+      this.clearTimer();
+      this.startTimer();
     }
-  }
 
-  startTimer() {
-    this.timer = setTimeout(this.onTimerEnd.bind(this), this.drawTime * 1000);
-  }
-
-  resetTimer() {
-    this.clearTimer();
-    this.startTimer();
-  }
-
-  clearTimer() {
-    clearTimeout(this.timer);
-    this.timer = null;
-  }
-
-  start() {
-    switch (this.state) {
-      case 'created':
-        if (!this.hasEnoughPlayers()) throw new Error('not enough players to start game!');
-        this.state = 'running';
-        this.availableRounds = this.rounds;
-        this.startTimer();
-        this.eventEmitter.emit('start', this.getPlayerInTurn());
-        break;
-      default:
-        throw new Error('game should be in "created" state!');
+    clearTimer() {
+      clearTimeout(this.timer);
+      this.timer = null;
     }
-  }
 
-  end() {
-    switch (this.state) {
-      case 'running':
+    start() {
+      switch (this.state) {
+        case 'created':
+          if (!this.hasEnoughPlayers()) throw new Error('not enough players to start game!');
+          this.state = 'running';
+          this.availableRounds = this.rounds;
+          this.startTimer();
+          this.eventEmitter.emit('start', this.getPlayerInTurn());
+          break;
+        default:
+          throw new Error('game should be in "created" state!');
+      }
+    }
+
+    end() {
+      switch (this.state) {
+        case 'running':
+          this.clearTimer();
+          this.state = 'ended';
+          this.eventEmitter.emit('end');
+          break;
+        default:
+          throw new Error('game should be in "running" state!');
+      }
+    }
+
+    reset() {
+      switch (this.state) {
+        case 'ended':
+          this.state = 'created';
+          this.turn = 0;
+          break;
+        default:
+          throw new Error('game should be in "ended" state!');
+      }
+    }
+
+    delete() {
+      if (this.state === 'running') {
         this.clearTimer();
-        this.state = 'ended';
-        this.eventEmitter.emit('end');
-        break;
-      default:
-        throw new Error('game should be in "running" state!');
+      }
+      this.eventEmitter.removeAllListeners();
+      this.eventEmitter = null;
+      this.players = null;
     }
-  }
-
-  reset() {
-    switch (this.state) {
-      case 'ended':
-        this.state = 'created';
-        this.turn = 0;
-        break;
-      default:
-        throw new Error('game should be in "ended" state!');
-    }
-  }
+  };
 }
 
-module.exports = Game;
+module.exports = {
+  init
+};
 
 // const players = [
 //   { name: 'yousif', id: 13 },
@@ -150,7 +161,6 @@ module.exports = Game;
 // setTimeout(() => {
 //   game.removePlayer(players[2]);
 // }, 1500);
-
 
 // players.forEach(game.addPlayer.bind(game));
 // game.start();

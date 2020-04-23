@@ -21,11 +21,10 @@
             const socket = io(`/${roomId}`, {
                 query: {
                     nickname
-                },
-                autoConnect: false
+                }
             });
-            socket.open((err, data)=>{
-                console.log(err, data)
+            socket.on('roomDeleted', () => {
+                console.log('roomDeleted!');
             })
             socket.on('playerJoined', data => {
                 console.log('playerJoined!', data);
