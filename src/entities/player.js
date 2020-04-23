@@ -1,8 +1,11 @@
+const { v4: uuidv4 } = require('uuid');
+
 function init() {
   return class Player {
-    constructor({ nickname, socket } = {}) {
+    constructor({ id, nickname, socket } = {}) {
       if (socket === undefined) throw new Error('socket is required!');
       this.nickname = nickname;
+      this.id = id !== undefined ? id : uuidv4();
       this.room = null;
       this.socket = socket;
       this.socket.on('disconnect', this.leaveRoom.bind(this));
@@ -13,20 +16,22 @@ function init() {
     }
 
     leaveRoom() {
-      this.room.onPlayerLeft(this);
       this.socket.removeAllListeners();
       this.socket = null;
+      const { room } = this;
       this.room = null;
+      room.onPlayerLeft(this);
     }
 
     getMetadata() {
       return {
-        nickname: this.nickname,
+        id: this.id,
+        nickname: this.nickname
       };
     }
   };
 }
 
 module.exports = {
-  init,
+  init
 };
