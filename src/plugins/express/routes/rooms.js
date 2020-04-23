@@ -13,20 +13,8 @@ function init() {
     }
   });
 
-  router.delete('/:roomId', async (req, res, next) => {
-    try {
-      const { roomId } = req.params;
-      await req.context.useCases.host.deleteRoom(roomId);
-      res.send();
-    } catch (error) {
-      next(error);
-    }
-  });
-
   router.get('/:roomId', async (req, res, next) => {
     try {
-      const { roomId } = req.params;
-      await req.context.useCases.player.joinRoom(roomId);
       res.sendfile(req.context.plugins.ui.roomPage);
     } catch (error) {
       next(error);

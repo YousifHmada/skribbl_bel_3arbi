@@ -1,14 +1,13 @@
-const CustomError = require('../../entities/customError');
 /* eslint-disable no-console */
 /* eslint-disable consistent-return */
-function init(displayErrors) {
+function init({ displayErrors, context }) {
   return (err, req, res, next) => {
     if (res.headersSent) {
       return next(err);
     }
     let statusCode = 500;
     let message = displayErrors ? err.message : 'An unexpected error occurred.';
-    if (err instanceof CustomError) {
+    if (err instanceof context.entities.CustomError) {
       message = err.getErrorMessage();
       statusCode = err.getStatusCode();
     } else {

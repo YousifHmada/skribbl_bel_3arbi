@@ -21,13 +21,17 @@
             const socket = io(`/${roomId}`, {
                 query: {
                     nickname
-                }
+                },
+                autoConnect: false
             });
-            socket.on('playerConnected', data => {
-                console.log('playerConnected!', data);
+            socket.open((err, data)=>{
+                console.log(err, data)
             })
-            socket.on('playerDisconnected', data => {
-                console.log('playerDisconnected!', data);
+            socket.on('playerJoined', data => {
+                console.log('playerJoined!', data);
+            })
+            socket.on('playerLeft', data => {
+                console.log('playerLeft!', data);
             })
         } else {
             window.location = '/';

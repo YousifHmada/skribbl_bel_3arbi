@@ -4,42 +4,24 @@ const socketIO = require('socket.io');
 function init(context) {
   const io = socketIO(context.plugins.express.server);
 
-  function createRoom(roomId) {
-    const roomNsp = io.of(`/${roomId}`);
-    console.log(`Room : ${roomId} created!`);
-
-    roomNsp.on('connection', onPlayerConnected);
-
-    function getNumPlayers() {
-      return Object.keys(roomNsp.sockets).length;
-    }
-
-    function onPlayerConnected(socket) {
-      const player = {
-        nickname: socket.handshake.query.nickname,
-      };
-      console.log('playerConnected', { player, numPlayers: getNumPlayers() });
-      socket.broadcast.emit('playerConnected', { player, numPlayers: getNumPlayers() });
-
-      socket.on('disconnect', onPlayerDisconnected);
-
-      function onPlayerDisconnected() {
-        console.log('playerDisconnected', { player, numPlayers: getNumPlayers() });
-        socket.broadcast.emit('playerDisconnected', { player, numPlayers: getNumPlayers() });
-      }
-    }
+  function createRoom(id) {
+    const socketNsp = io.of(`/${id}`);
+    console.log(`[Socket.io] Nsp : ${id} created!`);
+    const room = new context.entities.Room({ id, socketNsp });
+    return room;
   }
 
-  function deleteRoom(roomId) {
-    io.nsps[`/${roomId}`].removeAllListeners();
-    delete io.nsps[`/${roomId}`];
+  function removeNsp(nsp) {
+    nsp.removeAllListeners();
+    delete io.nsps[nsp.name];
+    console.log(`[Socket.io] Nsp : ${nsp.name} deleted!`);
   }
 
-  function hasRoom(roomId) {
-    return io.nsps[`/${roomId}`] !== undefined;
+  function hasRoom(id) {
+    return io.nsps[`/${id}`] !== undefined;
   }
 
-  return { createRoom, deleteRoom, hasRoom };
+  return { createRoom, removeNsp, hasRoom };
 }
 
 module.exports = {

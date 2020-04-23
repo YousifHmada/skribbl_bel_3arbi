@@ -21,7 +21,7 @@ function init(context) {
   app.use('/', initRoutes());
 
   const displayErrors = process.env.NODE_ENV === 'development';
-  app.use(errorHandler.init(displayErrors));
+  app.use(errorHandler.init({ displayErrors, context }));
 
   // eslint-disable-next-line no-console
   const server = app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`));
