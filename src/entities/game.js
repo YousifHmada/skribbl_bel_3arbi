@@ -5,7 +5,7 @@ function init() {
     constructor({ settings } = {}) {
       this.players = [];
       this.turn = 0;
-      this.state = 'created'; // States: created, running, finished
+      this.state = 'created'; // States: created, running, ended
       this.setSettings(settings);
       this.timer = null;
       this.eventEmitter = new EventEmiiter(); // Events: start, end, switchTurns
@@ -19,7 +19,7 @@ function init() {
       this.eventEmitter.off(...args);
     }
 
-    setSettings({ rounds = 2, drawTime = 1 } = {}) {
+    setSettings({ rounds = 3, drawTime = 60 } = {}) {
       if (this.state !== 'created') throw new Error('game should be in "created" state!');
       this.rounds = rounds;
       this.drawTime = drawTime;

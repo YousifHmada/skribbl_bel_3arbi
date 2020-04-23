@@ -1,9 +1,11 @@
+const { v4: uuidv4 } = require('uuid');
+
 function init() {
   return class Player {
-    constructor({ nickname, socket } = {}) {
+    constructor({ id, nickname, socket } = {}) {
       if (socket === undefined) throw new Error('socket is required!');
       this.nickname = nickname;
-      this.id = socket.id; // Just a unique id, any unique id will do
+      this.id = id !== undefined ? id : uuidv4();
       this.room = null;
       this.socket = socket;
       this.socket.on('disconnect', this.leaveRoom.bind(this));

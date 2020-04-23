@@ -7,7 +7,7 @@ function init(context) {
   function createRoom(id) {
     const socketNsp = io.of(`/${id}`);
     console.log(`[Socket.io] Nsp : ${id} created!`);
-    const room = new context.entities.Room({ id, socketNsp });
+    const room = new context.entities.Room({ socketNsp });
     return room;
   }
 
@@ -25,5 +25,5 @@ function init(context) {
 }
 
 module.exports = {
-  init,
+  init
 };

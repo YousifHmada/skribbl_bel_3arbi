@@ -17,11 +17,23 @@
             return url.split('rooms/')[1];
         }
         const roomId = getRoomIdFromWindow();
+        const userId = localStorage.getItem('userId');
         if (roomId && nickname) {
+            const query = {
+                nickname
+            };
+            if (userId) {
+                query.id = userId;
+            }
             const socket = io(`/${roomId}`, {
-                query: {
-                    nickname
-                }
+                query,
+            });
+            socket.on('connected', ({
+                player,
+                room
+            }) => {
+                console.log(player, room)
+                localStorage.setItem('userId', player.id);
             });
             socket.on('roomDeleted', () => {
                 console.log('roomDeleted!');

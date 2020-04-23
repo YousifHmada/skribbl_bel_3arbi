@@ -17,18 +17,25 @@ function init(context) {
       });
       player.joinRoom(this);
       this.game.addPlayer(player);
+      socket.emit('connected', {
+        player: player.getMetadata(),
+        room: this.getMetadata()
+      });
       this.emit('playerJoined', player.getMetadata());
     }
 
     getMetadata() {
       return {
         id: this.id,
-        players: this.players.map((player) => player.getMetadata())
+        players: this.game.players.map((player) => player.getMetadata())
       };
     }
 
     onPlayerLeft(player) {
       this.game.removePlayer(player);
+      if (this.game.players.length === 0) {
+        this.delete();
+      }
       this.emit('playerLeft', player.getMetadata());
     }
 
