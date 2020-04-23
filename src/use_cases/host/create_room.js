@@ -17,7 +17,6 @@ function init(context) {
     } while (context.plugins.socketIO.hasRoom(roomId));
 
     await context.plugins.socketIO.createRoom(roomId);
-
     return roomId;
   };
 }

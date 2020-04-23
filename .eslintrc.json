@@ -14,6 +14,8 @@
   },
   "rules": {
     "no-use-before-define": "off",
+    "prefer-arrow-callback": "off",
+    "class-methods-use-this": "off",
     "linebreak-style": "off",
     "indent": "off",
     "import/prefer-default-export": "off",
