@@ -1,88 +1,83 @@
-/* eslint-disable no-console */
-function generateRandomId(length) {
-  let result = '';
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  const charactersLength = characters.length;
-  // eslint-disable-next-line no-plusplus
-  for (let i = 0; i < length; i++) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
-  }
-  return result;
-}
+const EventEmiiter = require('events');
 
 class Game {
-  constructor(...args) {
+  constructor({ settings } = {}) {
     this.players = [];
     this.turn = 0;
     this.state = 'created'; // States: created, running, finished
-    this.setSettings(...args);
+    this.setSettings(settings);
     this.timer = null;
+    this.eventEmitter = new EventEmiiter(); // Events: start, end, switchTurns
   }
 
-  setSettings({
-    rounds = 3,
-    drawTime = 2,
-  } = {}) {
+  on(...args) {
+    this.eventEmitter.on(...args);
+  }
+
+  off(...args) {
+    this.eventEmitter.off(...args);
+  }
+
+  setSettings({ rounds = 2, drawTime = 1 } = {}) {
     if (this.state !== 'created') throw new Error('game should be in "created" state!');
     this.rounds = rounds;
     this.drawTime = drawTime;
   }
 
-  addPlayer(playerData) {
-    const player = { ...playerData };
-    const id = this.generatePlayerId();
-    player.id = id;
+  addPlayer(player) {
     this.players.push(player);
-    return id;
   }
 
-  removePlayer(playerId) {
-    const index = this.players.findIndex((player) => player.id === playerId);
+  removePlayer(player) {
+    const index = this.players.findIndex(
+      (currentPlayer) => currentPlayer === player,
+    );
     if (index < 0) throw new Error();
     this.players.splice(index, 1);
-    if (this.state === 'running' && !this.hasEnoughPlayers()) {
-      this.finishGame();
+    if (this.state === 'running') {
+      if (index < this.turn) {
+        this.turn -= 1;
+      } else if (index === this.turn) {
+        this.resetTimer();
+        this.eventEmitter.emit('switchTurns', this.getPlayerInTurn());
+      }
+      if (!this.hasEnoughPlayers()) {
+        this.end();
+      }
     }
   }
 
-  hasPlayer(playerId) {
-    // eslint-disable-next-line no-plusplus
-    for (let i = 0; i < this.players.length; i++) {
-      if (this.players[i].id === playerId) return true;
-    }
-    return false;
+  hasAvailableRounds() {
+    return this.availableRounds > 0;
   }
 
   hasEnoughPlayers() {
     return this.players.length > 1;
   }
 
-  generatePlayerId() {
-    let id;
-    do {
-      id = generateRandomId(5);
-    } while (this.hasPlayer(id));
-    return id;
-  }
-
   switchTurns() {
     this.turn = (this.turn + 1) % this.players.length;
   }
 
+  getPlayerInTurn() {
+    return this.players[this.turn];
+  }
+
   onTimerEnd() {
-    if (this.hasEnoughPlayers()) {
+    if (this.turn + 1 >= this.players.length) {
+      this.availableRounds -= 1;
+    }
+    if (this.hasEnoughPlayers() && this.hasAvailableRounds()) {
       this.switchTurns();
       this.resetTimer();
+      this.eventEmitter.emit('switchTurns', this.getPlayerInTurn());
     } else {
-      this.finishGame();
+      this.end();
     }
   }
 
   startTimer() {
-    this.timer = setTimeout(
-      this.onTimerEnd.bind(this),
-      this.drawTime * 1000,
-    );
+    this.timer = setTimeout(this.onTimerEnd.bind(this), this.drawTime * 1000);
   }
 
   resetTimer() {
@@ -95,30 +90,67 @@ class Game {
     this.timer = null;
   }
 
-  startGame() {
+  start() {
     switch (this.state) {
       case 'created':
         if (!this.hasEnoughPlayers()) throw new Error('not enough players to start game!');
         this.state = 'running';
+        this.availableRounds = this.rounds;
         this.startTimer();
-        console.log('Game started!');
+        this.eventEmitter.emit('start', this.getPlayerInTurn());
         break;
       default:
         throw new Error('game should be in "created" state!');
     }
   }
 
-  finishGame() {
+  end() {
     switch (this.state) {
       case 'running':
         this.clearTimer();
-        this.state = 'finished';
-        console.log('Game finished!');
+        this.state = 'ended';
+        this.eventEmitter.emit('end');
         break;
       default:
         throw new Error('game should be in "running" state!');
     }
   }
+
+  reset() {
+    switch (this.state) {
+      case 'ended':
+        this.state = 'created';
+        this.turn = 0;
+        break;
+      default:
+        throw new Error('game should be in "ended" state!');
+    }
+  }
 }
 
 module.exports = Game;
+
+// const players = [
+//   { name: 'yousif', id: 13 },
+//   { name: 'osama', id: 22 },
+//   { name: 'ebrahim', id: 44 },
+// ];
+
+// const game = new Game();
+// game.on('start', (player) => {
+//   console.log('game started', player);
+// });
+// game.on('end', () => {
+//   console.log('game ended');
+// });
+// game.on('switchTurns', (player) => {
+//   console.log('switch turns', player);
+// });
+
+// setTimeout(() => {
+//   game.removePlayer(players[2]);
+// }, 1500);
+
+
+// players.forEach(game.addPlayer.bind(game));
+// game.start();
