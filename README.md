@@ -12,7 +12,8 @@ POST /api/rooms
 ⬆: event listener
 ⬇: event emmiter
 
-⬇ connected => { me: Player, game:Game }
+⬇ connected => {me: Player, game:Game}
+⬇ connect_error => error: Error
 ⬇ playerJoined => player: Player
 ⬇ playerLeft => player: Player
 ⬇ hostChanged => host: Player

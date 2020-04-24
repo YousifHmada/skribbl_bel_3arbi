@@ -18,20 +18,27 @@ function init(context) {
     }
 
     onConnection(socket) {
-      const player = new context.entities.Player({
-        ...socket.handshake.query,
-        socket
-      });
-      player.joinRoom(this);
-      if (player.id === this.hostId) {
-        player.addHostPriviledges();
+      try {
+        const player = new context.entities.Player({
+          ...socket.handshake.query,
+          socket
+        });
+        player.joinRoom(this);
+        if (player.id === this.hostId) {
+          player.addHostPriviledges();
+        }
+        this.game.addPlayer(player);
+        player.emit('connected', {
+          me: player.getMetadata(),
+          game: this.game.getMetadata()
+        });
+        player.broadcast('playerJoined', player.getMetadata());
+      } catch (error) {
+        try {
+          socket.emit('connect_error', error.stack);
+          // eslint-disable-next-line no-empty
+        } catch (_) {}
       }
-      this.game.addPlayer(player);
-      player.emit('connected', {
-        me: player.getMetadata(),
-        game: this.game.getMetadata()
-      });
-      player.broadcast('playerJoined', player.getMetadata());
     }
 
     getMetadata() {
