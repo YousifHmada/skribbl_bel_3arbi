@@ -1,19 +1,20 @@
 # skribbl_bel_3arbi
-[Open App!](https://skribbl-bel-3arbi.herokuapp.com/ "Skribbl_bel_3arbi")
+
+[Open App!](https://skribbl-bel-3arbi.herokuapp.com/ 'Skribbl_bel_3arbi')
 
 # APIs
+
 ```
 POST /rooms
     body: {}
     return: 200 {link: string}
-    
+
 GET /rooms/:roomId
 ```
 
-# Events ⬆: send ⬇: reveive
+# Events ⬆: send ⬇: receive
 
-
-⬆ connected => {player, room}
+⬇ connected => {player, room}
 
 ⬇ playerJoined => player
 
@@ -21,12 +22,13 @@ GET /rooms/:roomId
 
 ⬇ roomDeleted => undefined
 
-``` 
+```
 player = {
     id,
     nickName
 }
 ```
+
 ```
 room = {
     id,
