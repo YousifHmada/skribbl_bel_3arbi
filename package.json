@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start": "node src/",
-    "build": "cd src/plugins/ui/react_app && npm run build",
+    "build": "cd src/plugins/ui/react_app && npm i && npm run build",
     "lint:fix": "eslint src/**/*{.js,.json} --fix && cd src/plugins/ui/react_app && npm run lint:fix",
     "lint": "eslint src/**/*{.js,.json}  && cd src/plugins/ui/react_app && npm run lint"
   },
