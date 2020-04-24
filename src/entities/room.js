@@ -13,6 +13,10 @@ function init(context) {
       console.log(`[Room ${this.id}] created!`);
     }
 
+    getPlayerGameStats(player) {
+      this.game.getPlayerStats(player.id);
+    }
+
     onConnection(socket) {
       const player = new context.entities.Player({
         ...socket.handshake.query,
@@ -20,7 +24,7 @@ function init(context) {
       });
       player.joinRoom(this);
       if (player.id === this.hostId) {
-        player.isHost = true;
+        player.addHostPriviledges();
       }
       this.game.addPlayer(player);
       player.emit('connected', {
@@ -30,15 +34,9 @@ function init(context) {
       player.broadcast('playerJoined', player.getMetadata());
     }
 
-    getPlayerGameStats(player) {
-      this.game.getPlayerStats(player.id);
-    }
-
-    getMetadata() {
-      return {
-        link: `/rooms${this.id}`,
-        hostId: this.hostId
-      };
+    startGame(gameSettings) {
+      this.game.setSettings(gameSettings);
+      this.game.start();
     }
 
     onPlayerLeft(player) {
@@ -48,17 +46,10 @@ function init(context) {
       } else {
         this.emit('playerLeft', player.getMetadata());
         if (player.isHost) {
-          this.game.players[0].isHost = true;
-          this.hostId = this.game.players[0].id;
+          this.game.players[0].addHostPriviledges();
           this.emit('hostChanged', this.game.players[0].getMetadata());
         }
       }
-    }
-
-    emit(...args) {
-      // eslint-disable-next-line no-console
-      console.log(`[Room ${this.id}]`, ...args);
-      this.socketNsp.emit(...args);
     }
 
     delete() {
@@ -73,6 +64,19 @@ function init(context) {
       console.log(`[Room ${this.id}] deleted!`);
       context.plugins.socketIO.removeNsp(this.socketNsp);
       this.socketNsp = null;
+    }
+
+    getMetadata() {
+      return {
+        link: `/rooms${this.id}`,
+        hostId: this.hostId
+      };
+    }
+
+    emit(...args) {
+      // eslint-disable-next-line no-console
+      console.log(`[Room ${this.id}]`, ...args);
+      this.socketNsp.emit(...args);
     }
   };
 }

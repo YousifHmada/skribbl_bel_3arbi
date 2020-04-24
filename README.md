@@ -17,6 +17,7 @@ POST /api/rooms
 ⬇ playerLeft => player: Player
 ⬇ hostChanged => host: Player
 ⬇ roomDeleted => undefined
+⬆ startGame => gameSettings : GameSettings `Host Privileges`
 
 ```
 player = {
@@ -52,7 +53,6 @@ Game = {
 ⬆: event listener
 ⬇: event emmiter
 
-⬆ startGame => gameSettings : GameSettings `Host Privileges`
 ⬇ newTurn => {turn: Number, availableRounds: Number, wordChoices: [String]} `Turn Privileges` OR
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{turn: Number, availableRounds: Number}
 ⬆ wordChoosen => word: string
