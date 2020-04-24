@@ -9,6 +9,7 @@
   "scripts": {
     "start": "node src/",
     "build": "cd src/plugins/ui/react_app && npm i && npm run build",
+    "test": "jest --notify",
     "lint:fix": "eslint src/**/*{.js,.json} --fix && cd src/plugins/ui/react_app && npm run lint:fix",
     "lint": "eslint src/**/*{.js,.json}  && cd src/plugins/ui/react_app && npm run lint"
   },
@@ -43,6 +44,7 @@
     "eslint-config-airbnb-base": "^14.1.0",
     "eslint-plugin-import": "^2.20.2",
     "eslint-plugin-react": "^7.19.0",
-    "husky": "^4.2.5"
+    "husky": "^4.2.5",
+    "jest": "^25.4.0"
   }
 }
