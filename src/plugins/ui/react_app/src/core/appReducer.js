@@ -26,6 +26,7 @@ export default (state, action) => {
       newState = state;
   }
 
+  // eslint-disable-next-line no-console
   console.log(action.type, newState);
   return newState;
 };

@@ -1,10 +1,10 @@
 import { Button, Container, Input } from '@material-ui/core';
 import React from 'react';
-import { GlobalContext } from './../../core/globalState';
+import { GlobalContext } from '../../core/globalState';
 
 export function UserRegistrationCard() {
   const [inputValue, setInputValue] = React.useState('');
-  const { actions } = React.useContext(GlobalContext)
+  const { actions } = React.useContext(GlobalContext);
 
   const handleSubmit = async () => {
     actions.createRoom();
@@ -19,7 +19,7 @@ export function UserRegistrationCard() {
   React.useEffect(() => {
     const roomId = getRoomIdFromWindow();
     if (roomId) {
-      actions.openConnection({ nickname: inputValue, roomId })
+      actions.openConnection({ nickname: inputValue, roomId });
     }
   }, []);
 

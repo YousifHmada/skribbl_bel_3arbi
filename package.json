@@ -13,9 +13,6 @@
     "lint": "eslint src/**/*{.js,.json}  && cd src/plugins/ui/react_app && npm run lint"
   },
   "husky": {
-    "hooks": {
-      "pre-commit": "npm run lint"
-    }
   },
   "repository": {
     "type": "git",
