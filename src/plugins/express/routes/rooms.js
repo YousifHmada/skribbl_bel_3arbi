@@ -12,14 +12,6 @@ function init() {
     }
   });
 
-  router.get('/:roomId', async (req, res, next) => {
-    try {
-      res.sendfile(req.context.plugins.ui.roomPage);
-    } catch (error) {
-      next(error);
-    }
-  });
-
   return router;
 }
 
