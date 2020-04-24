@@ -1,8 +1,16 @@
 import React from 'react';
-import { HomePage } from './components/homePage/HomePage';
+import { GlobalProvider } from './core/globalState';
+import { Routes } from './core/routes';
+
 
 function App() {
-  return <HomePage />;
+  return (
+    <GlobalProvider>
+      <center>
+        <Routes />
+      </center>
+    </GlobalProvider>
+  );
 }
 
 export default App;
