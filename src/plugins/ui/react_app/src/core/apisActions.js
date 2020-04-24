@@ -1,4 +1,4 @@
-import { roomService } from './../services/roomService';
+import { roomService } from '../services/roomService';
 
 export const apiActions = ({ dispatch }) => {
   const service = roomService();
