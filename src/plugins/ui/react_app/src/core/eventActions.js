@@ -26,10 +26,10 @@ export const eventActions = ({ dispatch }) => {
       });
     });
 
-    socketConnection.on('connected', ({ player }) => {
+    socketConnection.on('connected', (data) => {
       dispatch({
         type: 'CONNECTED_EVENT',
-        payload: player
+        payload: data
       });
     });
   };

@@ -4,10 +4,10 @@ export const apiActions = ({ dispatch }) => {
   const service = roomService();
 
   const createRoom = async () => {
-    const roomId = await service.createRoom();
+    const room = await service.createRoom();
     dispatch({
       type: 'CREATE_ROOM',
-      payload: roomId
+      payload: room
     });
   };
 

@@ -5,9 +5,8 @@ function init() {
 
   router.post('', async (req, res, next) => {
     try {
-      const roomId = await req.context.useCases.host.createRoom();
-      const link = `/rooms/${encodeURIComponent(roomId)}`;
-      res.send({ link });
+      const data = await req.context.useCases.host.createRoom();
+      res.json(data);
     } catch (error) {
       next(error);
     }

@@ -16,11 +16,11 @@ function init(context) {
       roomId = generateSlug(10);
     } while (context.plugins.socketIO.hasRoom(roomId));
 
-    await context.plugins.socketIO.createRoom(roomId);
-    return roomId;
+    const room = context.plugins.socketIO.createRoom(roomId);
+    return room.getMetadata();
   };
 }
 
 module.exports = {
-  init,
+  init
 };

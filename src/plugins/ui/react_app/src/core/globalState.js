@@ -2,6 +2,7 @@ import React from 'react';
 import { apiActions } from './apisActions';
 import appReducer from './appReducer';
 import { eventActions } from './eventActions';
+import localStoragePlugin from './localStorage';
 
 const initialState = {
   player: null,
@@ -25,6 +26,9 @@ export const GlobalProvider = ({ children }) => {
         actions: {
           ...apiActions({ dispatch }),
           ...eventActions({ dispatch })
+        },
+        plugins: {
+          localStorage: localStoragePlugin
         }
       }}>
       {children}
