@@ -33,9 +33,9 @@ function init(context) {
           game: this.game.getMetadata()
         });
         player.broadcast('playerJoined', player.getMetadata());
-      } catch (error) {
+      } catch ({ stack }) {
         try {
-          socket.emit('connect_error', error.stack);
+          socket.emit('connect_error', stack);
           // eslint-disable-next-line no-empty
         } catch (_) {}
       }

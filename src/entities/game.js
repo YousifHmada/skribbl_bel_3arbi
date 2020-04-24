@@ -107,7 +107,6 @@ function init() {
           this.state = 'running';
           this.roundsLeft = this.rounds;
           this.startTimer();
-          this.eventEmitter.emit('start', this.getPlayerInTurn());
           break;
         default:
           throw new Error('game should be in "created" state!');
