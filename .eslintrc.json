@@ -21,5 +21,6 @@
     "import/prefer-default-export": "off",
     "padded-blocks": "off",
     "comma-dangle": "off"
-  }
+  },
+  "ignorePatterns": ["**/node_modules/**"]
 }

@@ -9,18 +9,20 @@ export const socket = ({ nickname, roomId }) => {
     query.id = playerId;
   }
 
-  const socket = openSocket(`${baseURL}/${roomId}`, { query });
+  const socketConnection = openSocket(`${baseURL}/${roomId}`, { query });
 
   const playerJoinedEvent = (cb) => {
-    socket.on('playerJoined', (player) => (cb && cb(player)) || console.log(player));
+    // eslint-disable-next-line no-console
+    socketConnection.on('playerJoined', (player) => (cb && cb(player)) || console.log(player));
   };
 
   const playerLeftEvent = (cb) => {
-    socket.on('playerLeft', (player) => (cb && cb(player)) || console.log(player));
+    // eslint-disable-next-line no-console
+    socketConnection.on('playerLeft', (player) => (cb && cb(player)) || console.log(player));
   };
 
   const connectPlayerEvent = (cb) => {
-    socket.on('connected', ({ player }) => cb(player?.id));
+    socketConnection.on('connected', ({ player }) => cb(player.id));
   };
 
   return { playerJoinedEvent, playerLeftEvent, connectPlayerEvent };

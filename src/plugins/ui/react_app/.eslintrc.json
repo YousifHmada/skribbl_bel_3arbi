@@ -23,5 +23,6 @@
     "import/extensions": "off",
     "padded-blocks": "off",
     "comma-dangle": "off"
-  }
+  },
+  "ignorePatterns": ["**/build", "package.json", "package-lock.json"]
 }
