@@ -20,8 +20,8 @@ function init(context) {
     onConnection(socket) {
       try {
         const player = new context.entities.Player({
-          ...socket.handshake.query
-          // socket
+          ...socket.handshake.query,
+          socket
         });
         player.joinRoom(this);
         if (player.id === this.hostId) {
@@ -33,9 +33,9 @@ function init(context) {
           game: this.game.getMetadata()
         });
         player.broadcast('playerJoined', player.getMetadata());
-      } catch (error) {
+      } catch ({ stack }) {
         try {
-          socket.emit('connect_error', error.stack);
+          socket.emit('connect_error', stack);
           // eslint-disable-next-line no-empty
         } catch (_) {}
       }
