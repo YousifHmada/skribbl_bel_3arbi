@@ -19,6 +19,17 @@ function init() {
       this.eventEmitter.off(...args);
     }
 
+    getMetadata() {
+      return {
+        rounds: this.rounds,
+        drawTime: this.drawTime,
+        state: this.state,
+        turn: this.turn,
+        roundsLeft: this.roundsLeft,
+        players: this.players.map((player) => player.getMetadata())
+      };
+    }
+
     setSettings({ rounds = 3, drawTime = 60 } = {}) {
       if (this.state !== 'created') throw new Error('game should be in "created" state!');
       this.rounds = rounds;
@@ -46,8 +57,8 @@ function init() {
       }
     }
 
-    hasAvailableRounds() {
-      return this.availableRounds > 0;
+    hasRoundsLeft() {
+      return this.roundsLeft > 0;
     }
 
     hasEnoughPlayers() {
@@ -64,9 +75,9 @@ function init() {
 
     onTimerEnd() {
       if (this.turn + 1 >= this.players.length) {
-        this.availableRounds -= 1;
+        this.roundsLeft -= 1;
       }
-      if (this.hasEnoughPlayers() && this.hasAvailableRounds()) {
+      if (this.hasEnoughPlayers() && this.hasRoundsLeft()) {
         this.switchTurns();
         this.resetTimer();
         this.eventEmitter.emit('switchTurns', this.getPlayerInTurn());
@@ -94,7 +105,7 @@ function init() {
         case 'created':
           if (!this.hasEnoughPlayers()) throw new Error('not enough players to start game!');
           this.state = 'running';
-          this.availableRounds = this.rounds;
+          this.roundsLeft = this.rounds;
           this.startTimer();
           this.eventEmitter.emit('start', this.getPlayerInTurn());
           break;

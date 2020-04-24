@@ -8,12 +8,12 @@
   },
   "scripts": {
     "start": "node src/",
+    "client:start": "cd src/plugins/ui/react_app && npm start",
     "build": "cd src/plugins/ui/react_app && npm i && npm run build",
     "lint:fix": "eslint src/**/*{.js,.json} --fix && cd src/plugins/ui/react_app && npm run lint:fix",
     "lint": "eslint src/**/*{.js,.json}  && cd src/plugins/ui/react_app && npm run lint"
   },
-  "husky": {
-  },
+  "husky": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/YousifHmada/skribbl_bel_3arbi.git"

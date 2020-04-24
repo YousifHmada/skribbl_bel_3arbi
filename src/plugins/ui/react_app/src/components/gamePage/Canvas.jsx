@@ -20,7 +20,7 @@ import { PaletteTools } from './PaletteTools';
 //   hideInterface: false
 // };
 
-export const Canvas = () =>
+export const Canvas = () => (
   // const sketchProps = {
   //   tool:TOOL_PENCIL,
   //   size: 2,
@@ -29,11 +29,10 @@ export const Canvas = () =>
   //   fillColor: '#444444',
   //   items: []
   // }
-  (
-    <>
-      <h1>Hello Canvas</h1>
-      {/* <CanvasDraw {...defaultProps} /> */}
-      {/* <SketchPad
+  <>
+    <h1>Hello Canvas</h1>
+    {/* <CanvasDraw {...defaultProps} /> */}
+    {/* <SketchPad
             width={500}
             height={500}
             animate={true}
@@ -41,6 +40,6 @@ export const Canvas = () =>
             {...sketchProps}
             onCompleteItem={console.log}
           /> */}
-      <PaletteTools />
-    </>
-  );
+    <PaletteTools />
+  </>
+);

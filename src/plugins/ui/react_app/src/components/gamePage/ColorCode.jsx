@@ -11,9 +11,8 @@ const Cell = styled.div`
   margin: 5px;
 `;
 export const ColorCode = (props) => {
+  // eslint-disable-next-line react/prop-types
   const { onClick } = props;
   const color = getRandomColor();
-  return (
-    <Cell theme={{ color }} onClick={() => onClick(color)} />
-  );
+  return <Cell theme={{ color }} onClick={() => onClick(color)} />;
 };
