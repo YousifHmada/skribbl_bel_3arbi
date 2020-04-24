@@ -1,22 +1,17 @@
 import { Button, Container, Input } from '@material-ui/core';
 import React from 'react';
-import { socket } from '../../core/sockets';
-import { roomService } from '../../services/roomService';
+import { GlobalContext } from './../../core/globalState';
 
 export function UserRegistrationCard() {
   const [inputValue, setInputValue] = React.useState('');
-  const [url, setURL] = React.useState(null);
+  const { actions } = React.useContext(GlobalContext)
 
   const handleSubmit = async () => {
-    const link = await roomService().createRoom();
-    // eslint-disable-next-line no-console
-    console.log(link);
+    actions.createRoom();
     setInputValue('');
-    setURL(<a href={link}>{link}</a>);
   };
 
   function getRoomIdFromWindow() {
-    // eslint-disable-next-line no-shadow
     const url = window.location.href;
     return url.split('rooms/')[1];
   }
@@ -24,22 +19,16 @@ export function UserRegistrationCard() {
   React.useEffect(() => {
     const roomId = getRoomIdFromWindow();
     if (roomId) {
-      const mySocket = socket({ nickname: 'ayNickName', roomId });
-      mySocket.connectPlayerEvent((id) => {
-        localStorage.setItem('playerId', id);
-      });
-      mySocket.playerLeftEvent();
-      mySocket.playerJoinedEvent();
+      actions.openConnection({ nickname: inputValue, roomId })
     }
   }, []);
 
   return (
-    <Container maxWidth="lg" style={{ height: '500px' }}>
-      <Input value={inputValue} onChange={(e) => setInputValue(e.target.value)} />
-      <Button variant="contained" color="primary" onClick={handleSubmit}>
-        Submit
+    <Container maxWidth="lg" style={{ height: '500px', backgroundColor: 'white', padding: '20px' }}>
+      <Input color="secondary" value={inputValue} onChange={(e) => setInputValue(e.target.value)} placeholder="Enter your nickname" />
+      <Button variant="contained" color="secondary" onClick={handleSubmit}>
+        Create private room
       </Button>
-      {url}
     </Container>
   );
 }
