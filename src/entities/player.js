@@ -26,19 +26,23 @@ function init() {
       room.onPlayerLeft(this);
     }
 
-    addHostPrivileges() {
+    addHostPriviledges() {
       this.isHost = true;
       this.socket.on('startGame', this.startGame.bind(this));
     }
 
-    removeHostPrivileges() {
+    removeHostPriviledges() {
       this.isHost = false;
       this.socket.off('startGame');
     }
 
-    startGame(gameSettings) {
-      if (this.isHost === true) throw new Error('player should have host priviledges to start game');
-      this.room.startGame(gameSettings);
+    startGame(gameSettings, ack) {
+      try {
+        if (this.isHost === true) throw new Error('player should have host priviledges to start game');
+        this.room.startGame(gameSettings);
+      } catch ({ stack }) {
+        ack(stack); // This signals an error on client!
+      }
     }
 
     getMetadata() {

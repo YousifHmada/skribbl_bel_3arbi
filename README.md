@@ -18,7 +18,7 @@ POST /api/rooms
 ⬇ playerLeft => player: Player
 ⬇ hostChanged => host: Player
 ⬇ roomDeleted => undefined
-⬆ startGame => gameSettings : GameSettings `Host Privileges`
+⬆ startGame => gameSettings : GameSettings `Host Privileges` => Ack(error){} # will send an ack error if something went wrong on server
 
 ```
 Room {
