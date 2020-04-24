@@ -8,9 +8,9 @@ export function UserRegistrationCard() {
   const [url, setURL] = React.useState(null);
 
   const handleSubmit = async () => {
-    const link = await roomService().createRoom();
+    const { hostId, link } = await roomService().createRoom();
+    localStorage.setItem('playerId', hostId);
     // eslint-disable-next-line no-console
-    console.log(link);
     setInputValue('');
     setURL(<a href={link}>{link}</a>);
   };

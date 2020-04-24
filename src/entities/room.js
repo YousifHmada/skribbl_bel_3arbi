@@ -1,13 +1,16 @@
+const { v4: uuidv4 } = require('uuid');
+
 function init(context) {
   return class Room {
     constructor({ socketNsp }) {
       if (socketNsp === undefined) throw new Error('socketNsp is required!');
       this.id = socketNsp.name;
+      this.hostId = uuidv4();
       this.game = new context.entities.Game();
       this.socketNsp = socketNsp;
+      this.socketNsp.on('connection', this.onConnection.bind(this));
       // eslint-disable-next-line no-console
       console.log(`[Room ${this.id}] created!`);
-      this.socketNsp.on('connection', this.onConnection.bind(this));
     }
 
     onConnection(socket) {
@@ -16,18 +19,25 @@ function init(context) {
         socket
       });
       player.joinRoom(this);
+      if (player.id === this.hostId) {
+        player.isHost = true;
+      }
       this.game.addPlayer(player);
-      socket.emit('connected', {
-        player: player.getMetadata(),
-        room: this.getMetadata()
+      player.emit('connected', {
+        me: player.getMetadata(),
+        game: this.game.getMetadata()
       });
-      this.emit('playerJoined', player.getMetadata());
+      player.broadcast('playerJoined', player.getMetadata());
+    }
+
+    getPlayerGameStats(player) {
+      this.game.getPlayerStats(player.id);
     }
 
     getMetadata() {
       return {
-        id: this.id,
-        players: this.game.players.map((player) => player.getMetadata())
+        link: `/rooms${this.id}`,
+        hostId: this.hostId
       };
     }
 
@@ -35,8 +45,14 @@ function init(context) {
       this.game.removePlayer(player);
       if (this.game.players.length === 0) {
         this.delete();
+      } else {
+        this.emit('playerLeft', player.getMetadata());
+        if (player.isHost) {
+          this.game.players[0].isHost = true;
+          this.hostId = this.game.players[0].id;
+          this.emit('hostChanged', this.game.players[0].getMetadata());
+        }
       }
-      this.emit('playerLeft', player.getMetadata());
     }
 
     emit(...args) {
