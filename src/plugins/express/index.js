@@ -8,9 +8,11 @@ const errorHandler = require('./errorHandler');
 function init(context) {
   const app = express();
   const port = process.env.PORT || 3000;
+
+  app.use(express.static(context.plugins.ui.publicDir));
+
   app.use(bodyParser.json());
   app.use(cors());
-
   app.use(morgan(':method :url :status :res[content-length] - :response-time ms'));
 
   app.use((req, res, next) => {
@@ -18,7 +20,7 @@ function init(context) {
     next();
   });
 
-  app.use('/', initRoutes());
+  app.use('/api', initRoutes());
 
   const displayErrors = process.env.NODE_ENV === 'development';
   app.use(errorHandler.init({ displayErrors, context }));
@@ -30,5 +32,5 @@ function init(context) {
 }
 
 module.exports = {
-  init,
+  init
 };
