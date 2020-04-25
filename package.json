@@ -1,0 +1,16 @@
+{
+  "name": "skribbl_bel_3arbi",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "lint": "cd app && npm run lint  && cd ../server && npm run lint"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint"
+    }
+  },
+  "devDependencies": {
+    "husky": "^4.2.5"
+  }
+}

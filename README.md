@@ -1,0 +1,117 @@
+# APIs
+
+```
+POST /api/rooms
+    body: {}
+    return: 200 room: Room
+
+```
+
+# Events
+
+⬆: Events to emit<br />
+⬇: Events to subscribe<br />
+
+⬇ connected => {me: Player, game:Game} <br />
+⬇ connect_error => error: Error <br />
+⬇ playerJoined => player: Player <br />
+⬇ playerLeft => player: Player <br />
+⬇ hostChanged => host: Player <br />
+⬇ roomDeleted => undefined <br />
+⬆ startGame => gameSettings : GameSettings `Host Privileges` => Ack(error){} # will send an ack error if something went wrong on server <br />
+
+# Objects
+
+```
+Room {
+    id: String,
+    link: String,
+    hostId: String
+}
+
+Player {
+    id: String,
+    nickname: String,
+    isHost: Bool,
+    gameData:{
+        hintsLeft: number,
+        score: number
+    }
+}
+
+GameSettings {
+    rounds: Number,
+    drawTime: Number
+}
+
+Game {
+    ...gameSettings,
+    state: String, # created, running, ended
+    turn: Number,
+    availableRounds: Number,
+    players: [Player]
+}
+```
+
+---
+
+# TODOs:
+
+# Events
+
+⬆: Events to emit <br />
+⬇: Events to listen on <br />
+
+⬇ newTurn => { turn: Number, availableRounds: Number, wordChoices: [String] } `Turn Privileges` OR <br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{ turn: Number, availableRounds: Number } <br />
+⬆ wordChoosen => word: string <br />
+⬇ wordChoosen => word: string `NOT` `Turn Priviledges` # word is hidden <br />
+⬆ WordHintRequested => index: Number => { letter: char } <br />
+⬇ drawTimerStarted => undefined <br />
+⬇ drawTimerUpdated => timeLeft: number # in seconds <br />
+⬇ drawTimerEnded => { score: Score } <br />
+⬆ reactSent => { target: Number, reactId: Number } <br />
+⬇ reactSent => { source: Number, target: Number, reactId: Number } <br />
+⬆ wordGuessed => word: string => { correct: Bool, close: Bool } <br />
+⬇ wordGuessed => { name: String, correct: Bool, word?: String } # word should be null in case of correct guess <br />
+⬆ boardUpdated => { action: String, ...params } `Turn Privileges` <br />
+⬇ boardUpdated => { action: String, ...params } # draw line or change any of the draw settings <br />
+
+# Objects
+
+```
+Room {
+    id: String,
+    link: String,
+    hostId: String
+}
+
+Player {
+    id: String,
+    nickname: String,
+    isHost: Bool,
+    gameData:{
+        hintsLeft: number,
+        score: number
+    }
+}
+
+GameSettings {
+    rounds: Number,
+    drawTime: Number
+}
+
+Game {
+    ...gameSettings,
+    state: String, # created, running, ended
+    turn: Number,
+    availableRounds: Number,
+    players: [Player]
+}
+
+Score {
+    ...
+    [playerId]: Number
+    ...
+}
+```
