@@ -2,7 +2,7 @@ import React from 'react';
 import { apiActions } from './apisActions';
 import appReducer from './appReducer';
 import { eventActions } from './eventActions';
-import localStoragePlugin from './localStorage';
+import localStoragePlugin from './localStorage'
 
 const initialState = {
   player: null,

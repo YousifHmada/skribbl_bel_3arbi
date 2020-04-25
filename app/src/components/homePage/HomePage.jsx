@@ -8,9 +8,7 @@ export function HomePage() {
 
   return (
     <>
-      <div style={{ textAlign: 'center' }}>
-        <img className="logo logoBig" src="logo.gif" />
-      </div>
+
       <Button variant="contained" color="primary" onClick={() => history.push('/room')}>
         Game Page
       </Button>
