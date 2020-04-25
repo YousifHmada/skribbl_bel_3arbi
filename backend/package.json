@@ -13,7 +13,11 @@
     "lint:fix": "eslint src/**/*{.js,.json} --fix && cd src/plugins/ui/react_app && npm run lint:fix",
     "lint": "eslint src/**/*{.js,.json}  && cd src/plugins/ui/react_app && npm run lint"
   },
-  "husky": {},
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint"
+    }
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/YousifHmada/skribbl_bel_3arbi.git"
