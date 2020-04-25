@@ -11,6 +11,9 @@ function App() {
   initAnalytics();
   return (
     <GlobalProvider>
+      <div style={{ textAlign: 'center' }}>
+        <img className="logo logoBig" src="logo.gif" />
+      </div>
       <center>
         <Routes />
       </center>
