@@ -9,5 +9,8 @@
     "hooks": {
       "pre-commit": "npm run lint"
     }
+  },
+  "devDependencies": {
+    "husky": "^4.2.5"
   }
 }
