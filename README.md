@@ -9,16 +9,18 @@ POST /api/rooms
 
 # Events
 
-⬆: event listener
-⬇: event emmiter
+⬆: Events to emit<br />
+⬇: Events to subscribe<br />
 
-⬇ connected => {me: Player, game:Game}
-⬇ connect_error => error: Error
-⬇ playerJoined => player: Player
-⬇ playerLeft => player: Player
-⬇ hostChanged => host: Player
-⬇ roomDeleted => undefined
-⬆ startGame => gameSettings : GameSettings `Host Privileges` => Ack(error){} # will send an ack error if something went wrong on server
+⬇ connected => {me: Player, game:Game} <br />
+⬇ connect_error => error: Error <br />
+⬇ playerJoined => player: Player <br />
+⬇ playerLeft => player: Player <br />
+⬇ hostChanged => host: Player <br />
+⬇ roomDeleted => undefined <br />
+⬆ startGame => gameSettings : GameSettings `Host Privileges` => Ack(error){} # will send an ack error if something went wrong on server <br />
+
+# Objects
 
 ```
 Room {
@@ -57,23 +59,23 @@ Game {
 
 # Events
 
-⬆: event listener
-⬇: event emmiter
+⬆: Events to emit <br />
+⬇: Events to listen on <br />
 
-⬇ newTurn => { turn: Number, availableRounds: Number, wordChoices: [String] } `Turn Privileges` OR
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{ turn: Number, availableRounds: Number }
-⬆ wordChoosen => word: string
-⬇ wordChoosen => word: string `NOT` `Turn Priviledges` # word is hidden
-⬆ WordHintRequested => index: Number => { letter: char }
-⬇ drawTimerStarted => undefined
-⬇ drawTimerUpdated => timeLeft: number # in seconds
-⬇ drawTimerEnded => { score: Score }
-⬆ reactSent => { target: Number, reactId: Number }
-⬇ reactSent => { source: Number, target: Number, reactId: Number }
-⬆ wordGuessed => word: string => { correct: Bool, close: Bool }
-⬇ wordGuessed => { name: String, correct: Bool, word?: String } # word should be null in case of correct guess
-⬆ boardUpdated => { action: String, ...params } `Turn Privileges`
-⬇ boardUpdated => { action: String, ...params } # draw line or change any of the draw settings
+⬇ newTurn => { turn: Number, availableRounds: Number, wordChoices: [String] } `Turn Privileges` OR <br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{ turn: Number, availableRounds: Number } <br />
+⬆ wordChoosen => word: string <br />
+⬇ wordChoosen => word: string `NOT` `Turn Priviledges` # word is hidden <br />
+⬆ WordHintRequested => index: Number => { letter: char } <br />
+⬇ drawTimerStarted => undefined <br />
+⬇ drawTimerUpdated => timeLeft: number # in seconds <br />
+⬇ drawTimerEnded => { score: Score } <br />
+⬆ reactSent => { target: Number, reactId: Number } <br />
+⬇ reactSent => { source: Number, target: Number, reactId: Number } <br />
+⬆ wordGuessed => word: string => { correct: Bool, close: Bool } <br />
+⬇ wordGuessed => { name: String, correct: Bool, word?: String } # word should be null in case of correct guess <br />
+⬆ boardUpdated => { action: String, ...params } `Turn Privileges` <br />
+⬇ boardUpdated => { action: String, ...params } # draw line or change any of the draw settings <br />
 
 # Objects
 
