@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
+    "install": "cd src/server && npm install && cd ../app && npm install",
     "start": "cd src/server && npm start",
     "start:client": "cd src/app && npm start",
     "build": "cd src/app && npm run build",
