@@ -8,15 +8,8 @@
   },
   "scripts": {
     "start": "node src/",
-    "client:start": "cd src/plugins/ui/react_app && npm start",
-    "build": "cd src/plugins/ui/react_app && npm i && npm run build",
-    "lint:fix": "eslint src/**/*{.js,.json} --fix && cd src/plugins/ui/react_app && npm run lint:fix",
+    "lint:fix": "eslint src/**/*{.js,.json} --fix",
     "lint": "eslint src/**/*{.js,.json}"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "npm run lint"
-    }
   },
   "repository": {
     "type": "git",
@@ -43,7 +36,6 @@
     "eslint": "^6.8.0",
     "eslint-config-airbnb-base": "^14.1.0",
     "eslint-plugin-import": "^2.20.2",
-    "eslint-plugin-react": "^7.19.0",
-    "husky": "^4.2.5"
+    "eslint-plugin-react": "^7.19.0"
   }
 }

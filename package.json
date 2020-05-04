@@ -3,7 +3,11 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "lint": "cd app && npm run lint  && cd ../server && npm run lint"
+    "start": "cd src/server && npm start",
+    "start:client": "cd src/app && npm start",
+    "build": "cd src/app && npm run build",
+    "lint:fix": "cd src/app && npm run lint:fix  && cd ../server && npm run lint:fix",
+    "lint": "cd src/app && npm run lint  && cd ../server && npm run lint"
   },
   "husky": {
     "hooks": {
