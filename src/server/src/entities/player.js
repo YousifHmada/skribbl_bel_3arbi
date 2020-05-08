@@ -22,6 +22,19 @@ function init() {
       this.playerGameStats = null;
       this.socket = socket;
       this.socket.on('disconnect', this.onDisconnect.bind(this));
+      // Init handlers
+      this.chooseWordHandler = () => {};
+      this.updateBoardHandler = () => {};
+      this.startGameHandler = () => {};
+      this.socket.on('chooseWord', (...args) => {
+        this.chooseWordHandler(...args);
+      });
+      this.socket.on('updateBoard', (...args) => {
+        this.updateBoardHandler(...args);
+      });
+      this.socket.on('startGame', (...args) => {
+        this.startGameHandler(...args);
+      });
     }
 
     onDisconnect() {
@@ -34,28 +47,38 @@ function init() {
 
     addHostPriviledges() {
       this.isHost = true;
-      this.socket.on('startGame', this.startGame.bind(this));
+      this.startGameHandler = this.startGame;
     }
 
     removeHostPriviledges() {
       this.isHost = false;
-      this.socket.off('startGame');
+      this.startGameHandler = () => {};
     }
 
     addTurnPriviledges() {
       this.hasTurnPriviledges = true;
-      this.socket.on('chooseWord', this.chooseWord.bind(this));
+      this.chooseWordHandler = this.chooseWord;
+      this.updateBoardHandler = this.updateBoard;
     }
 
     removeTurnPriviledges() {
       this.hasTurnPriviledges = false;
-      try {
-        this.socket.off('chooseWord');
-      } catch (error) {}
+      this.chooseWordHandler = () => {};
+      this.updateBoardHandler = () => {};
     }
 
     chooseWord(index) {
+      if (this.hasTurnPriviledges !== true) throw new Error('player should have turn priviledges to choose a word');
       this.game.onWordChoosen(index);
+    }
+
+    updateBoard(data, ack) {
+      if (this.hasTurnPriviledges !== true) throw new Error('player should have turn priviledges to draw');
+      try {
+        this.room.onBoardUpdated(this, data);
+      } catch (error) {
+        ack(stack); // This signals an error on client!
+      }
     }
 
     startGame(gameSettings, ack) {

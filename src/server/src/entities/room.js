@@ -111,6 +111,10 @@ function init(context) {
       }
     }
 
+    onBoardUpdated(player, data) {
+      player.broadcast('boardUpdated', data);
+    }
+
     delete() {
       this.onPlayerLeft = () => {};
       // eslint-disable-next-line no-plusplus
