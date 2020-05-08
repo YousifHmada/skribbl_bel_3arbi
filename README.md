@@ -32,6 +32,8 @@ POST /api/rooms
 ⬇ boardUpdated => { action: String, ...params } # draw line or change any of the draw settings <br />
 ⬆ updateProfile => { nickname: String, avatar: [Number] } # this event is limited to non running game states<br />
 ⬇ profileUpdated => player: Player # this event is limited to non running game states<br />
+⬆ sendReact => { target: Number, reactId: Number } <br />
+⬇ reactSent => { source: Number, target: Number, reactId: Number } <br />
 
 # Objects
 
@@ -81,10 +83,8 @@ Score {
 ⬆: Events to emit <br />
 ⬇: Events to listen on <br />
 
-⬆ WordHintRequested => index: Number => { letter: char } <br />
-⬆ reactSent => { target: Number, reactId: Number } <br />
-⬇ reactSent => { source: Number, target: Number, reactId: Number } <br />
-⬆ wordGuessed => word: string => { correct: Bool, close: Bool } <br />
+⬆ requestWordHint => index: Number => { letter: char } <br />
+⬆ guessWord => word: string => { correct: Bool, close: Bool } <br />
 ⬇ wordGuessed => { name: String, correct: Bool, word?: String } # word should be null in case of correct guess <br />
 
 # Objects

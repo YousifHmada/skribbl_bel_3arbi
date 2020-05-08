@@ -93,6 +93,10 @@ function init(context) {
       this.emit('drawTimerEnded');
     }
 
+    onReactSent(player, reaction) {
+      player.broadcast('reactSent', { source: player.id, ...reaction });
+    }
+
     getMetadata() {
       return {
         id: this.id,
