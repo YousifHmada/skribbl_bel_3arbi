@@ -23,6 +23,7 @@ function init() {
       this.socket = socket;
       this.socket.on('disconnect', this.onDisconnect.bind(this));
       this.socket.on('updateProfile', this.updateProfile.bind(this));
+      this.socket.on('sendReact', this.sendReact.bind(this));
       // Init handlers
       this.chooseWordHandler = () => {};
       this.updateBoardHandler = () => {};
@@ -90,6 +91,14 @@ function init() {
         this.avatar = avatar;
       }
       this.room.onProfileUpdated(this);
+    }
+
+    sendReact(reaction, ack) {
+      try {
+        this.room.onReactSent(this, reaction);
+      } catch ({ stack }) {
+        ack(stack);
+      }
     }
 
     startGame(gameSettings, ack) {
