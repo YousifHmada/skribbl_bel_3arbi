@@ -34,6 +34,8 @@ POST /api/rooms
 ⬇ profileUpdated => player: Player # this event is limited to non running game states<br />
 ⬆ sendReact => { target: Number, reactId: Number } <br />
 ⬇ reactSent => { source: Number, target: Number, reactId: Number } <br />
+⬆ guessWord => word: string => { correct: Bool, close: Bool } <br />
+⬇ wordGuessed => { name: String, correct: Bool, close?: Bool, word?: String } # word should be null in case of correct guess <br />
 
 # Objects
 
@@ -84,8 +86,6 @@ Score {
 ⬇: Events to listen on <br />
 
 ⬆ requestWordHint => index: Number => { letter: char } <br />
-⬆ guessWord => word: string => { correct: Bool, close: Bool } <br />
-⬇ wordGuessed => { name: String, correct: Bool, word?: String } # word should be null in case of correct guess <br />
 
 # Objects
 
