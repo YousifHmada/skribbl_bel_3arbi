@@ -9,6 +9,24 @@ function getRandomAvatar() {
   return [getRandomNum(17), getRandomNum(30), getRandomNum(23), -1];
 }
 
+function cleanInput(input) {
+  input = input.split('أ').join('ا');
+  input = input.split('إ').join('ا');
+  input = input.split('آ').join('ا');
+  input = input.split('ة').join('ه');
+  input = input.split('\uFE84').join('\uFE8E');
+  input = input.split('\uFE88').join('\uFE8E');
+  input = input.split('\uFE82').join('\uFE8E');
+  input = input.split('\uFEF5').join('\uFEFB');
+  input = input.split('\uFEF7').join('\uFEFB');
+  input = input.split('\uFEF9').join('\uFEFB');
+  input = input.split('\uFEF6').join('\uFEFC');
+  input = input.split('\uFEF8').join('\uFEFC');
+  input = input.split('\uFEFA').join('\uFEFC');
+  input = input.split('\u0624').join('\u0648');
+  return input;
+}
+
 function init() {
   return class Player {
     constructor({ id, nickname, avatar, socket, room, game } = {}) {
@@ -92,7 +110,7 @@ function init() {
       try {
         if (this.game.state !== 'running') throw new Error('game should be in running state');
         if (this.hasTurnPriviledges) throw new Error("player can't guess with turnPriviledges");
-        this.game.onWordGuessed(this, input, ack);
+        this.game.onWordGuessed(this, cleanInput(input), ack);
       } catch ({ stack }) {
         ack(stack);
       }
