@@ -19,11 +19,14 @@ function init() {
       this.isHost = false;
       this.room = room;
       this.game = game;
-      this.playerGameStats = null;
+      this.gameData = {
+        score: 0
+      };
       this.socket = socket;
       this.socket.on('disconnect', this.onDisconnect.bind(this));
       this.socket.on('updateProfile', this.updateProfile.bind(this));
       this.socket.on('sendReact', this.sendReact.bind(this));
+      this.socket.on('guessWord', this.guessWord.bind(this));
       // Init handlers
       this.chooseWordHandler = () => {};
       this.updateBoardHandler = () => {};
@@ -45,6 +48,16 @@ function init() {
       const { room } = this;
       this.room = null;
       room.onPlayerLeft(this);
+    }
+
+    getMetadata() {
+      return {
+        id: this.id,
+        nickname: this.nickname,
+        avatar: this.avatar,
+        isHost: this.isHost, // TODO
+        gameData: this.gameData
+      };
     }
 
     addHostPriviledges() {
@@ -69,32 +82,56 @@ function init() {
       this.updateBoardHandler = () => {};
     }
 
+    resetGameData() {
+      this.gameData = {
+        score: 0
+      };
+    }
+
+    guessWord(input, ack) {
+      try {
+        if (this.game.state !== 'running') throw new Error('game should be in running state');
+        if (this.hasTurnPriviledges) throw new Error("player can't guess with turnPriviledges");
+        this.game.onWordGuessed(this, input, ack);
+      } catch ({ stack }) {
+        ack(stack);
+      }
+    }
+
     chooseWord(index) {
+      if (this.game.state !== 'running') throw new Error('game should be in running state');
       if (this.hasTurnPriviledges !== true) throw new Error('player should have turn priviledges to choose a word');
       this.game.onWordChoosen(index);
     }
 
     updateBoard(data, ack) {
-      if (this.hasTurnPriviledges !== true) throw new Error('player should have turn priviledges to draw');
       try {
+        if (this.game.state !== 'running') throw new Error('game should be in running state');
+        if (this.hasTurnPriviledges !== true) throw new Error('player should have turn priviledges to draw');
         this.room.onBoardUpdated(this, data);
-      } catch (error) {
+      } catch ({ stack }) {
         ack(stack); // This signals an error on client!
       }
     }
 
-    updateProfile({ nickname, avatar } = {}) {
-      if (nickname) {
-        this.nickname = nickname;
+    updateProfile({ nickname, avatar } = {}, ack) {
+      try {
+        if (this.game.state === 'running') throw new Error('game should not be in running state');
+        if (nickname) {
+          this.nickname = nickname;
+        }
+        if (avatar) {
+          this.avatar = avatar;
+        }
+        this.room.onProfileUpdated(this);
+      } catch ({ stack }) {
+        ack(stack);
       }
-      if (avatar) {
-        this.avatar = avatar;
-      }
-      this.room.onProfileUpdated(this);
     }
 
     sendReact(reaction, ack) {
       try {
+        if (this.game.state !== 'running') throw new Error('game should be in running state');
         this.room.onReactSent(this, reaction);
       } catch ({ stack }) {
         ack(stack);
@@ -109,16 +146,6 @@ function init() {
       } catch ({ stack }) {
         ack(stack); // This signals an error on client!
       }
-    }
-
-    getMetadata() {
-      return {
-        id: this.id,
-        nickname: this.nickname,
-        avatar: this.avatar,
-        isHost: this.isHost, // TODO
-        playerGameStats: this.playerGameStats
-      };
     }
 
     emit(...args) {

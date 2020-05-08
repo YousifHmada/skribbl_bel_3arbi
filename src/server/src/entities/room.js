@@ -20,8 +20,12 @@ function init(context) {
       console.log(`[Room ${this.id}] created!`);
     }
 
-    getPlayerGameStats(player) {
-      this.game.getPlayerStats(player.id);
+    getMetadata() {
+      return {
+        id: this.id,
+        link: `/rooms${this.id}`,
+        hostId: this.hostId
+      };
     }
 
     onConnection(socket) {
@@ -54,6 +58,9 @@ function init(context) {
     }
 
     onGameover(score) {
+      for (let i = 0; i < this.game.players.length; i++) {
+        this.game.players[i].removeTurnPriviledges();
+      }
       this.emit('gameover', score);
     }
 
@@ -95,14 +102,6 @@ function init(context) {
 
     onReactSent(player, reaction) {
       player.broadcast('reactSent', { source: player.id, ...reaction });
-    }
-
-    getMetadata() {
-      return {
-        id: this.id,
-        link: `/rooms${this.id}`,
-        hostId: this.hostId
-      };
     }
 
     onPlayerLeft(player) {

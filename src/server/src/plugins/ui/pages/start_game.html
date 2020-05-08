@@ -16,7 +16,11 @@
         <button onclick="chooseWord"></button>
         <button onclick="chooseWord"></button>
     </div>
+    <input type="text" id="console-input">
+    <button id="console-button" disabled>submit</button>
     <script>
+        const consoleButton = document.getElementById('console-button')
+        const consoleInput = document.getElementById('console-input')
         const button = document.getElementsByTagName('button')[0]
         const wordChoicesDiv = document.getElementById('wordChoices')
         const wordChoicesButtons = wordChoicesDiv.getElementsByTagName('button')
@@ -105,6 +109,7 @@
             })
             socket.on('gameStarted', gameSettings => {
                 button.disabled = true;
+                consoleButton.disabled = false;
                 console.log('gameStarted!', gameSettings);
             })
             socket.on('wordChoosen', word => {
@@ -122,6 +127,7 @@
             })
             socket.on('gameover', score => {
                 button.disabled = false;
+                consoleButton.disabled = true;
                 console.log('gameover!', score);
             })
 
@@ -138,8 +144,19 @@
             })
 
             socket.on('boardUpdated', (update) => {
-                console.log('boardUpdated', update)
+                // console.log('boardUpdated', update)
             })
+
+            socket.on('wordGussed', (data) => {
+                console.log('wordGussed', data)
+            })
+
+            consoleButton.addEventListener('click', () => {
+                socket.emit('guessWord', consoleInput.value, (err, data) => {
+                    console.log(err, data)
+                })
+                consoleInput.value = ''
+            });
 
             setInterval(() => {
                 try {
