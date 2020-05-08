@@ -77,6 +77,10 @@ function init(context) {
       );
     }
 
+    onProfileUpdated(player) {
+      player.broadcast('profileUpdated', player);
+    }
+
     onDrawTimerStarted() {
       this.emit('drawTimerStarted');
     }

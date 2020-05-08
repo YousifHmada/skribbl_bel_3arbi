@@ -22,6 +22,7 @@ function init() {
       this.playerGameStats = null;
       this.socket = socket;
       this.socket.on('disconnect', this.onDisconnect.bind(this));
+      this.socket.on('updateProfile', this.updateProfile.bind(this));
       // Init handlers
       this.chooseWordHandler = () => {};
       this.updateBoardHandler = () => {};
@@ -79,6 +80,16 @@ function init() {
       } catch (error) {
         ack(stack); // This signals an error on client!
       }
+    }
+
+    updateProfile({ nickname, avatar } = {}) {
+      if (nickname) {
+        this.nickname = nickname;
+      }
+      if (avatar) {
+        this.avatar = avatar;
+      }
+      this.room.onProfileUpdated(this);
     }
 
     startGame(gameSettings, ack) {
