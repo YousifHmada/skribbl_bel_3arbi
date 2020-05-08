@@ -1,11 +1,20 @@
 const { v4: uuidv4 } = require('uuid');
 const moniker = require('moniker');
 
+function getRandomNum(max) {
+  return Math.floor(Math.random() * max + 1);
+}
+
+function getRandomAvatar() {
+  return [getRandomNum(17), getRandomNum(30), getRandomNum(23), -1];
+}
+
 function init() {
   return class Player {
-    constructor({ id, nickname, socket, room, game } = {}) {
+    constructor({ id, nickname, avatar, socket, room, game } = {}) {
       if (socket === undefined) throw new Error('socket is required!');
       this.nickname = nickname || moniker.choose();
+      this.avatar = avatar || getRandomAvatar();
       this.id = id || uuidv4();
       this.isHost = false;
       this.room = room;
@@ -63,6 +72,7 @@ function init() {
       return {
         id: this.id,
         nickname: this.nickname,
+        avatar: this.avatar,
         isHost: this.isHost, // TODO
         playerGameStats: this.playerGameStats
       };
