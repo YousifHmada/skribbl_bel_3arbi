@@ -8,7 +8,7 @@ function init(context) {
       this.state = 'created'; // States: created, running, ended
       this.setSettings(settings);
       this.timer = null;
-      this.eventEmitter = new EventEmiiter(); // Events: gameStart, gameover, newTurn, wordChoosen
+      this.eventEmitter = new EventEmiiter(); // Events: gameStart, gameover, newTurn, wordChoosen, drawTimerStarted, drawTimerUpdated, drawTimerEnded
       this.waitForWordChoiceTime = 5;
     }
 
@@ -31,7 +31,7 @@ function init(context) {
       };
     }
 
-    setSettings({ rounds = 3, drawTime = 5 } = {}) {
+    setSettings({ rounds = 3, drawTime = 10 } = {}) {
       if (this.state !== 'created') throw new Error('game should be in "created" state!');
       this.rounds = rounds;
       this.drawTime = drawTime;
@@ -59,6 +59,9 @@ function init(context) {
         if (index < this.turn) {
           this.turn -= 1;
         } else if (index === this.turn) {
+          if (this.waitForWordChoiceTimer) {
+            clearTimeout(this.waitForWordChoiceTimer);
+          }
           this.dispatchNewTurn();
         }
         if (!this.hasEnoughPlayers()) {
@@ -83,11 +86,6 @@ function init(context) {
       return this.players[this.turn];
     }
 
-    getPreviousPlayer() {
-      const turn = this.turn - 1;
-      return this.players[turn < 0 ? this.players.length - 1 : turn];
-    }
-
     async getWordChoices() {
       return context.plugins.firebase.getWords(3);
     }
@@ -106,8 +104,7 @@ function init(context) {
       const score = this.getScore();
       this.onWordChoosen = onWordChoosen;
       this.eventEmitter.emit('newTurn', {
-        prevPlayer: this.getPreviousPlayer(),
-        curPlayer: this.getCurrentPlayer(),
+        player: this.getCurrentPlayer(),
         turn: this.turn,
         score,
         roundsLeft: this.roundsLeft,
@@ -135,6 +132,7 @@ function init(context) {
     }
 
     onTimerEnd() {
+      this.eventEmitter.emit('drawTimerEnded');
       if (this.turn + 1 >= this.players.length) {
         this.roundsLeft -= 1;
       }
@@ -148,6 +146,7 @@ function init(context) {
 
     startTimer() {
       this.timer = setTimeout(this.onTimerEnd.bind(this), this.drawTime * 1000);
+      this.eventEmitter.emit('drawTimerStarted');
     }
 
     resetTimer() {

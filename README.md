@@ -24,6 +24,9 @@ POST /api/rooms
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{ turn: Number, availableRounds: Number, score: Score } <br />
 ⬆ chooseWord => word: string <br />
 ⬇ wordChoosen => word: string # word is hidden for players with no turn priviledges <br />
+⬇ drawTimerStarted => undefined <br />
+⬇ drawTimerUpdated => timeLeft: number # in seconds <br />
+⬇ drawTimerEnded => undefined <br />
 ⬇ gameover => score : Score <br />
 
 # Objects
@@ -75,9 +78,6 @@ Score {
 ⬇: Events to listen on <br />
 
 ⬆ WordHintRequested => index: Number => { letter: char } <br />
-⬇ drawTimerStarted => undefined <br />
-⬇ drawTimerUpdated => timeLeft: number # in seconds <br />
-⬇ drawTimerEnded => { score: Score } <br />
 ⬆ reactSent => { target: Number, reactId: Number } <br />
 ⬇ reactSent => { source: Number, target: Number, reactId: Number } <br />
 ⬆ wordGuessed => word: string => { correct: Bool, close: Bool } <br />

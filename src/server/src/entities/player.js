@@ -40,7 +40,9 @@ function init() {
 
     removeTurnPriviledges() {
       this.hasTurnPriviledges = false;
-      this.socket.off('chooseWord');
+      try {
+        this.socket.off('chooseWord');
+      } catch (error) {}
     }
 
     chooseWord(index) {

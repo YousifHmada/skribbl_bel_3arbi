@@ -11,6 +11,9 @@ function init(context) {
       this.game.on('newTurn', this.onNewTurn.bind(this));
       this.game.on('wordChoosen', this.onWordChoosen.bind(this));
       this.game.on('gameover', this.onGameover.bind(this));
+      this.game.on('drawTimerStarted', this.onDrawTimerStarted.bind(this));
+      this.game.on('drawTimerUpdated', this.onDrawTimerUpdated.bind(this));
+      this.game.on('drawTimerEnded', this.onDrawTimerEnded.bind(this));
       this.socketNsp = socketNsp;
       this.socketNsp.on('connection', this.onConnection.bind(this));
       // eslint-disable-next-line no-console
@@ -54,11 +57,13 @@ function init(context) {
       this.emit('gameover', score);
     }
 
-    onNewTurn({ prevPlayer, curPlayer, score, turn, roundsLeft, wordChoices }) {
-      // prevPlayer.removeTurnPriviledges();
-      curPlayer.addTurnPriviledges();
-      curPlayer.emit('newTurn', { turn, score, roundsLeft, wordChoices });
-      curPlayer.broadcast('newTurn', { turn, score, roundsLeft });
+    onNewTurn({ player, score, turn, roundsLeft, wordChoices }) {
+      for (let i = 0; i < this.game.players.length; i++) {
+        this.game.players[i].removeTurnPriviledges();
+      }
+      player.addTurnPriviledges();
+      player.emit('newTurn', { turn, score, roundsLeft, wordChoices });
+      player.broadcast('newTurn', { turn, score, roundsLeft });
     }
 
     onWordChoosen({ player, word }) {
@@ -70,6 +75,18 @@ function init(context) {
           .map(() => '-')
           .join('')
       );
+    }
+
+    onDrawTimerStarted() {
+      this.emit('drawTimerStarted');
+    }
+
+    onDrawTimerUpdated(timeLeft) {
+      this.emit('drawTimerUpdated', timeLeft);
+    }
+
+    onDrawTimerEnded() {
+      this.emit('drawTimerEnded');
     }
 
     getMetadata() {
