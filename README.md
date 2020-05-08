@@ -28,6 +28,8 @@ POST /api/rooms
 ⬇ drawTimerUpdated => timeLeft: number # in seconds <br />
 ⬇ drawTimerEnded => undefined <br />
 ⬇ gameover => score : Score <br />
+⬆ updateBoard => { action: String, ...params } `Turn Privileges` <br />
+⬇ boardUpdated => { action: String, ...params } # draw line or change any of the draw settings <br />
 
 # Objects
 
@@ -82,8 +84,6 @@ Score {
 ⬇ reactSent => { source: Number, target: Number, reactId: Number } <br />
 ⬆ wordGuessed => word: string => { correct: Bool, close: Bool } <br />
 ⬇ wordGuessed => { name: String, correct: Bool, word?: String } # word should be null in case of correct guess <br />
-⬆ boardUpdated => { action: String, ...params } `Turn Privileges` <br />
-⬇ boardUpdated => { action: String, ...params } # draw line or change any of the draw settings <br />
 
 # Objects
 
