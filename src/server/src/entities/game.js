@@ -1,14 +1,15 @@
 const EventEmiiter = require('events');
 
-function init() {
+function init(context) {
   return class Game {
-    constructor({ settings } = {}) {
+    constructor(settings = {}) {
       this.players = [];
       this.turn = 0;
       this.state = 'created'; // States: created, running, ended
       this.setSettings(settings);
       this.timer = null;
-      this.eventEmitter = new EventEmiiter(); // Events: start, end, switchTurns
+      this.eventEmitter = new EventEmiiter(); // Events: gameStart, gameover, newTurn, wordChoosen
+      this.waitForWordChoiceTime = 5;
     }
 
     on(...args) {
@@ -30,14 +31,24 @@ function init() {
       };
     }
 
-    setSettings({ rounds = 3, drawTime = 60 } = {}) {
+    setSettings({ rounds = 3, drawTime = 5 } = {}) {
       if (this.state !== 'created') throw new Error('game should be in "created" state!');
       this.rounds = rounds;
       this.drawTime = drawTime;
     }
 
+    getSettings() {
+      return {
+        rounds: this.rounds,
+        drawTime: this.drawTime
+      };
+    }
+
     addPlayer(player) {
-      this.players.push(player);
+      const index = this.players.findIndex((currentPlayer) => currentPlayer === player);
+      if (index < 0) {
+        this.players.push(player);
+      }
     }
 
     removePlayer(player) {
@@ -48,8 +59,7 @@ function init() {
         if (index < this.turn) {
           this.turn -= 1;
         } else if (index === this.turn) {
-          this.resetTimer();
-          this.eventEmitter.emit('switchTurns', this.getPlayerInTurn());
+          this.dispatchNewTurn();
         }
         if (!this.hasEnoughPlayers()) {
           this.end();
@@ -69,8 +79,59 @@ function init() {
       this.turn = (this.turn + 1) % this.players.length;
     }
 
-    getPlayerInTurn() {
+    getCurrentPlayer() {
       return this.players[this.turn];
+    }
+
+    getPreviousPlayer() {
+      const turn = this.turn - 1;
+      return this.players[turn < 0 ? this.players.length - 1 : turn];
+    }
+
+    async getWordChoices() {
+      return context.plugins.firebase.getWords(3);
+    }
+
+    getScore() {
+      const score = {};
+      for (let i = 0; i < this.players.length; i++) {
+        const { id } = this.players[i];
+        score[id] = 300;
+      }
+      return score;
+    }
+
+    async dispatchNewTurn() {
+      this.currentWordChoices = await this.getWordChoices();
+      const score = this.getScore();
+      this.onWordChoosen = onWordChoosen;
+      this.eventEmitter.emit('newTurn', {
+        prevPlayer: this.getPreviousPlayer(),
+        curPlayer: this.getCurrentPlayer(),
+        turn: this.turn,
+        score,
+        roundsLeft: this.roundsLeft,
+        wordChoices: this.currentWordChoices
+      });
+
+      // Timer to choose a word in case of player choice timeout
+      this.waitForWordChoiceTimer = setTimeout(() => {
+        this.onWordChoosen = () => {};
+        const index = Math.floor(Math.random() * 3); // random index between 0 and 2
+        onWordChoosen.bind(this)(index);
+      }, this.waitForWordChoiceTime * 1000);
+
+      function onWordChoosen(index) {
+        clearTimeout(this.waitForWordChoiceTimer); // Disable system autoWordChoose
+        this.waitForWordChoiceTimer = null;
+        if (index >= this.currentWordChoices.length) throw new Error('Invalid word choice!');
+        this.currentWord = this.currentWordChoices[index];
+        this.eventEmitter.emit('wordChoosen', {
+          player: this.getCurrentPlayer(),
+          word: this.currentWord
+        });
+        this.resetTimer();
+      }
     }
 
     onTimerEnd() {
@@ -79,8 +140,7 @@ function init() {
       }
       if (this.hasEnoughPlayers() && this.hasRoundsLeft()) {
         this.switchTurns();
-        this.resetTimer();
-        this.eventEmitter.emit('switchTurns', this.getPlayerInTurn());
+        this.dispatchNewTurn();
       } else {
         this.end();
       }
@@ -106,7 +166,10 @@ function init() {
           if (!this.hasEnoughPlayers()) throw new Error('not enough players to start game!');
           this.state = 'running';
           this.roundsLeft = this.rounds;
-          this.startTimer();
+          setTimeout(() => {
+            this.eventEmitter.emit('gameStart', this.getSettings());
+            this.dispatchNewTurn();
+          }, 0);
           break;
         default:
           throw new Error('game should be in "created" state!');
@@ -117,8 +180,11 @@ function init() {
       switch (this.state) {
         case 'running':
           this.clearTimer();
+          if (this.waitForWordChoiceTimer) {
+            clearTimeout(this.waitForWordChoiceTimer);
+          }
           this.state = 'ended';
-          this.eventEmitter.emit('end');
+          this.eventEmitter.emit('gameover', this.getScore());
           break;
         default:
           throw new Error('game should be in "running" state!');
@@ -139,6 +205,9 @@ function init() {
     delete() {
       if (this.state === 'running') {
         this.clearTimer();
+        if (this.waitForWordChoiceTimer) {
+          clearTimeout(this.waitForWordChoiceTimer);
+        }
       }
       this.eventEmitter.removeAllListeners();
       this.eventEmitter = null;
@@ -150,27 +219,3 @@ function init() {
 module.exports = {
   init
 };
-
-// const players = [
-//   { name: 'yousif', id: 13 },
-//   { name: 'osama', id: 22 },
-//   { name: 'ebrahim', id: 44 },
-// ];
-
-// const game = new Game();
-// game.on('start', (player) => {
-//   console.log('game started', player);
-// });
-// game.on('end', () => {
-//   console.log('game ended');
-// });
-// game.on('switchTurns', (player) => {
-//   console.log('switch turns', player);
-// });
-
-// setTimeout(() => {
-//   game.removePlayer(players[2]);
-// }, 1500);
-
-// players.forEach(game.addPlayer.bind(game));
-// game.start();

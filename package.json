@@ -6,6 +6,7 @@
     "install": "cd src/server && npm install && cd ../app && npm install",
     "start": "cd src/server && npm start",
     "start:client": "cd src/app && npm start",
+    "start:devClient": "cd src/server/src/plugins/ui/pages && serve",
     "build": "cd src/app && npm run build",
     "lint:fix": "cd src/app && npm run lint:fix  && cd ../server && npm run lint:fix",
     "lint": "cd src/app && npm run lint  && cd ../server && npm run lint"
@@ -16,6 +17,7 @@
     }
   },
   "devDependencies": {
-    "husky": "^4.2.5"
+    "husky": "^4.2.5",
+    "serve": "^11.3.0"
   }
 }

@@ -3,22 +3,19 @@ const moniker = require('moniker');
 
 function init() {
   return class Player {
-    constructor({ id, nickname, socket } = {}) {
+    constructor({ id, nickname, socket, room, game } = {}) {
       if (socket === undefined) throw new Error('socket is required!');
       this.nickname = nickname || moniker.choose();
       this.id = id || uuidv4();
       this.isHost = false;
-      this.room = null;
+      this.room = room;
+      this.game = game;
       this.playerGameStats = null;
       this.socket = socket;
-      this.socket.on('disconnect', this.leaveRoom.bind(this));
+      this.socket.on('disconnect', this.onDisconnect.bind(this));
     }
 
-    joinRoom(room) {
-      this.room = room;
-    }
-
-    leaveRoom() {
+    onDisconnect() {
       this.socket.removeAllListeners();
       this.socket = null;
       const { room } = this;
@@ -36,10 +33,25 @@ function init() {
       this.socket.off('startGame');
     }
 
+    addTurnPriviledges() {
+      this.hasTurnPriviledges = true;
+      this.socket.on('chooseWord', this.chooseWord.bind(this));
+    }
+
+    removeTurnPriviledges() {
+      this.hasTurnPriviledges = false;
+      this.socket.off('chooseWord');
+    }
+
+    chooseWord(index) {
+      this.game.onWordChoosen(index);
+    }
+
     startGame(gameSettings, ack) {
       try {
-        if (this.isHost === true) throw new Error('player should have host priviledges to start game');
-        this.room.startGame(gameSettings);
+        if (this.isHost !== true) throw new Error('player should have host priviledges to start game');
+        this.game.setSettings(gameSettings);
+        this.game.start();
       } catch ({ stack }) {
         ack(stack); // This signals an error on client!
       }

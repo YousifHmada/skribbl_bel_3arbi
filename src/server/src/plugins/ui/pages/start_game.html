@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="http://localhost:3000/socket.io/socket.io.js"></script>
+</head>
+
+<body>
+    <button disabled>start Game!</button>
+    <div id='wordChoices' hidden>
+        choices :
+        <button onclick="chooseWord"></button>
+        <button onclick="chooseWord"></button>
+        <button onclick="chooseWord"></button>
+    </div>
+    <script>
+        const button = document.getElementsByTagName('button')[0]
+        const wordChoicesDiv = document.getElementById('wordChoices')
+        const wordChoicesButtons = wordChoicesDiv.getElementsByTagName('button')
+        wordChoicesButtons[0].addEventListener('click', () => chooseWord(0))
+        wordChoicesButtons[1].addEventListener('click', () => chooseWord(1))
+        wordChoicesButtons[2].addEventListener('click', () => chooseWord(2))
+
+        function getRoomIdFromWindow() {
+            const url = window.location.href
+            return url.split('?roomId=')[1];
+        }
+        const roomId = getRoomIdFromWindow();
+        if (roomId) {
+            const nickname = localStorage.getItem('nickname');
+            const playerId = localStorage.getItem('playerId');
+            let game = null
+            let me = null
+            const query = {};
+            if (playerId) {
+                query.id = playerId;
+            }
+            if (nickname) {
+                query.nickname = nickname;
+            }
+            const socket = io(`http://localhost:3000${roomId}`, {
+                query,
+            });
+            socket.on('connected', (data) => {
+                console.log('connected!', data)
+                localStorage.setItem('playerId', data.me.id);
+                localStorage.setItem('nickname', data.me.nickname);
+                me = data.me;
+                game = data.game;
+                if (data.me.isHost) {
+                    button.disabled = false;
+                    button.addEventListener('click', function startGame() {
+                        const gameSettings = {};
+                        socket.emit('startGame', gameSettings, (err) => {
+                            console.log(err)
+                        })
+                    });
+                }
+            });
+
+            function addPlayer(player) {
+                const index = game.players.findIndex((currentPlayer) => currentPlayer.id === player.id);
+                if (index < 0) {
+                    game.players.push(player);
+                }
+            }
+
+            function removePlayer(player) {
+                const index = game.players.findIndex((currentPlayer) => currentPlayer.id === player.id);
+                if (index < 0) throw new Error();
+                game.players.splice(index, 1);
+            }
+
+            function chooseWord(index) {
+                socket.emit('chooseWord', index)
+            }
+
+            socket.on('roomDeleted', () => {
+                game = null
+                console.log('roomDeleted!');
+            })
+            socket.on('playerJoined', player => {
+                addPlayer(player)
+                console.log('playerJoined!', player, game);
+            })
+            socket.on('playerLeft', player => {
+                removePlayer(player)
+                console.log('playerLeft!', player, game);
+            })
+            socket.on('hostChanged', host => {
+                if (host.id === me.id) {
+                    me = host
+                    button.disabled = false;
+                    button.addEventListener('click', function startGame() {
+                        const gameSettings = {};
+                        socket.emit('startGame', gameSettings, (err) => {
+                            console.log(err)
+                        })
+                    });
+                }
+                console.log('hostChanged!', host);
+            })
+            socket.on('gameStarted', gameSettings => {
+                button.disabled = true;
+                console.log('gameStarted!', gameSettings);
+            })
+            socket.on('wordChoosen', word => {
+                wordChoicesDiv.hidden = true
+                console.log('wordChoosen!', word);
+            })
+            socket.on('newTurn', data => {
+                if (data.wordChoices) {
+                    wordChoicesButtons[0].innerText = data.wordChoices[0]
+                    wordChoicesButtons[1].innerText = data.wordChoices[1]
+                    wordChoicesButtons[2].innerText = data.wordChoices[2]
+                    wordChoicesDiv.hidden = false
+                }
+                console.log('newTurn!', data);
+            })
+            socket.on('gameover', score => {
+                button.disabled = false;
+                console.log('gameover!', score);
+            })
+        } else {
+            window.location = '/create_room';
+        }
+    </script>
+</body>
+
+</html>

@@ -1,92 +1,95 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-  </head>
 
-  <body>
-    <div>
-      <span>Nickname : </span><input type="text" name="nickname" id="nicknameInput" />
-      <button id="tryAnotherNicknameBtn">Try Another Nickname!</button>
-    </div>
-    <div>
-      <br />
-      <button id="createRoomBtn">Create Room!</button>
-    </div>
-    <p>Room link : <a id="roomLink" href="#"></a></p>
-    <script>
-      const createRoomBtn = document.getElementById('createRoomBtn');
-      const tryAnotherNicknameBtn = document.getElementById('tryAnotherNicknameBtn');
-      const roomLink = document.getElementById('roomLink');
-      const nicknameInput = document.getElementById('nicknameInput');
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+</head>
 
-      function readNickname() {
-        function enableInputChange() {
-          nicknameInput.disabled = false;
-          nicknameInput.addEventListener('input', changeNicknameHandler);
-        }
-        nicknameInput.disabled = true;
-        const nickname = localStorage.getItem('nickname');
-        if (nickname) {
-          nicknameInput.value = nickname;
-          enableInputChange();
-        } else {
-          fetch('/api/nickname')
-            .then((response) => {
-              return response.json();
-            })
-            .then((data) => {
-              console.log(data);
-              nicknameInput.value = data.nickname;
-              changeNicknameHandler.apply(nicknameInput);
-              enableInputChange();
-            })
-            .catch((data) => {
-              enableInputChange();
-            });
-        }
+<body>
+  <div>
+    <span>Nickname : </span><input type="text" name="nickname" id="nicknameInput" />
+    <button id="tryAnotherNicknameBtn">Try Another Nickname!</button>
+  </div>
+  <div>
+    <br />
+    <button id="createRoomBtn">Create Room!</button>
+  </div>
+  <p>Room link : <a id="roomLink" href="#"></a></p>
+  <script>
+    const createRoomBtn = document.getElementById('createRoomBtn');
+    const tryAnotherNicknameBtn = document.getElementById('tryAnotherNicknameBtn');
+    const roomLink = document.getElementById('roomLink');
+    const nicknameInput = document.getElementById('nicknameInput');
+
+    function readNickname() {
+      function enableInputChange() {
+        nicknameInput.disabled = false;
+        nicknameInput.addEventListener('input', changeNicknameHandler);
       }
-
-      readNickname();
-
-      createRoomBtn.addEventListener('click', createRoomBtnHandler);
-      tryAnotherNicknameBtn.addEventListener('click', tryAnotherNicknameHandler);
-
-      function createRoomBtnHandler() {
-        createRoomBtn.removeEventListener('click', () => {});
-        console.log('request sent!');
-        fetch('/api/rooms', {
-          method: 'post'
-        })
+      nicknameInput.disabled = true;
+      const nickname = localStorage.getItem('nickname');
+      if (nickname) {
+        nicknameInput.value = nickname;
+        enableInputChange();
+      } else {
+        fetch('http://localhost:3000/api/nickname')
           .then((response) => {
             return response.json();
           })
           .then((data) => {
-            roomLink.innerText = data.link;
-            roomLink.href = data.link;
-            createRoomBtn.addEventListener('click', createRoomBtnHandler);
+            console.log(data);
+            nicknameInput.value = data.nickname;
+            changeNicknameHandler.apply(nicknameInput);
+            enableInputChange();
           })
           .catch((data) => {
-            createRoomBtn.addEventListener('click', createRoomBtnHandler);
+            enableInputChange();
           });
       }
+    }
 
-      function changeNicknameHandler() {
-        const nickname = this.value;
-        localStorage.setItem('nickname', nickname);
-      }
+    readNickname();
 
-      function tryAnotherNicknameHandler() {
-        localStorage.removeItem('nickname');
-        readNickname();
-      }
+    createRoomBtn.addEventListener('click', createRoomBtnHandler);
+    tryAnotherNicknameBtn.addEventListener('click', tryAnotherNicknameHandler);
 
-      function changeNicknameHandler() {
-        const nickname = this.value;
-        localStorage.setItem('nickname', nickname);
-      }
-    </script>
-  </body>
+    function createRoomBtnHandler() {
+      createRoomBtn.removeEventListener('click', () => {});
+      console.log('request sent!');
+      fetch('http://localhost:3000/api/rooms', {
+          method: 'post'
+        })
+        .then((response) => {
+          return response.json();
+        })
+        .then((data) => {
+          localStorage.setItem('playerId', data.hostId);
+          roomLink.innerText = data.link;
+          roomLink.href = '/start_game?roomId=' + encodeURI(data.id);
+          createRoomBtn.addEventListener('click', createRoomBtnHandler);
+        })
+        .catch((data) => {
+          createRoomBtn.addEventListener('click', createRoomBtnHandler);
+        });
+    }
+
+    function changeNicknameHandler() {
+      const nickname = this.value;
+      localStorage.setItem('nickname', nickname);
+    }
+
+    function tryAnotherNicknameHandler() {
+      localStorage.removeItem('nickname');
+      readNickname();
+    }
+
+    function changeNicknameHandler() {
+      const nickname = this.value;
+      localStorage.setItem('nickname', nickname);
+    }
+  </script>
+</body>
+
 </html>
