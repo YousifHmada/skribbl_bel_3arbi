@@ -124,6 +124,18 @@
                 button.disabled = false;
                 console.log('gameover!', score);
             })
+
+            socket.on('drawTimerStarted', () => {
+                console.log('drawTimerStarted!');
+            })
+
+            socket.on('drawTimerUpdated', timeLeft => {
+                console.log('drawTimerUpdated!', 'timeLeft', timeLeft);
+            })
+
+            socket.on('drawTimerEnded', () => {
+                console.log('drawTimerEnded!');
+            })
         } else {
             window.location = '/create_room';
         }
