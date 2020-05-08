@@ -30,6 +30,8 @@ POST /api/rooms
 ⬇ gameover => score : Score <br />
 ⬆ updateBoard => { action: String, ...params } `Turn Privileges` <br />
 ⬇ boardUpdated => { action: String, ...params } # draw line or change any of the draw settings <br />
+⬆ updateProfile => { nickname: String, avatar: [Number] } # this event is limited to non running game states<br />
+⬇ profileUpdated => player: Player # this event is limited to non running game states<br />
 
 # Objects
 
