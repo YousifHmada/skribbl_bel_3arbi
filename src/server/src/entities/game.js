@@ -20,6 +20,13 @@ function init(context) {
       this.eventEmitter.off(...args);
     }
 
+    getTimeLeft() {
+      if (this.timer) {
+        return Math.ceil((this.timer._idleStart + this.timer._idleTimeout) / 1000 - process.uptime());
+      }
+      return null;
+    }
+
     getMetadata() {
       return {
         rounds: this.rounds,
