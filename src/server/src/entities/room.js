@@ -7,6 +7,10 @@ function init(context) {
       this.id = socketNsp.name;
       this.hostId = uuidv4();
       this.game = new context.entities.Game();
+      this.game.on('gameStart', this.onGameStart.bind(this));
+      this.game.on('newTurn', this.onNewTurn.bind(this));
+      this.game.on('wordChoosen', this.onWordChoosen.bind(this));
+      this.game.on('gameover', this.onGameover.bind(this));
       this.socketNsp = socketNsp;
       this.socketNsp.on('connection', this.onConnection.bind(this));
       // eslint-disable-next-line no-console
@@ -21,9 +25,10 @@ function init(context) {
       try {
         const player = new context.entities.Player({
           ...socket.handshake.query,
-          socket
+          socket,
+          room: this,
+          game: this.game
         });
-        player.joinRoom(this);
         if (player.id === this.hostId) {
           player.addHostPriviledges();
         }
@@ -41,6 +46,32 @@ function init(context) {
       }
     }
 
+    onGameStart(gameSettings) {
+      this.emit('gameStarted', gameSettings);
+    }
+
+    onGameover(score) {
+      this.emit('gameover', score);
+    }
+
+    onNewTurn({ prevPlayer, curPlayer, score, turn, roundsLeft, wordChoices }) {
+      // prevPlayer.removeTurnPriviledges();
+      curPlayer.addTurnPriviledges();
+      curPlayer.emit('newTurn', { turn, score, roundsLeft, wordChoices });
+      curPlayer.broadcast('newTurn', { turn, score, roundsLeft });
+    }
+
+    onWordChoosen({ player, word }) {
+      player.emit('wordChoosen', word);
+      player.broadcast(
+        'wordChoosen',
+        word
+          .split('')
+          .map(() => '-')
+          .join('')
+      );
+    }
+
     getMetadata() {
       return {
         id: this.id,
@@ -49,19 +80,15 @@ function init(context) {
       };
     }
 
-    startGame(gameSettings) {
-      this.game.setSettings(gameSettings);
-      this.game.start();
-    }
-
     onPlayerLeft(player) {
+      this.emit('playerLeft', player.getMetadata());
       this.game.removePlayer(player);
       if (this.game.players.length === 0) {
         this.delete();
       } else {
-        this.emit('playerLeft', player.getMetadata());
         if (player.isHost) {
           this.game.players[0].addHostPriviledges();
+          this.hostId = this.game.players[0].id;
           this.emit('hostChanged', this.game.players[0].getMetadata());
         }
       }

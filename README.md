@@ -19,6 +19,12 @@ POST /api/rooms
 ⬇ hostChanged => host: Player <br />
 ⬇ roomDeleted => undefined <br />
 ⬆ startGame => gameSettings : GameSettings `Host Privileges` => Ack(error){} # will send an ack error if something went wrong on server <br />
+⬇ gameStarted => gameSettings : GameSettings <br />
+⬇ newTurn => { turn: Number, availableRounds: Number, score: Score, wordChoices: [String] } `Turn Privileges` OR <br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{ turn: Number, availableRounds: Number, score: Score } <br />
+⬆ chooseWord => word: string <br />
+⬇ wordChoosen => word: string # word is hidden for players with no turn priviledges <br />
+⬇ gameover => score : Score <br />
 
 # Objects
 
@@ -51,6 +57,12 @@ Game {
     availableRounds: Number,
     players: [Player]
 }
+
+Score {
+    ...
+    [playerId]: Number
+    ...
+}
 ```
 
 ---
@@ -62,10 +74,6 @@ Game {
 ⬆: Events to emit <br />
 ⬇: Events to listen on <br />
 
-⬇ newTurn => { turn: Number, availableRounds: Number, wordChoices: [String] } `Turn Privileges` OR <br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{ turn: Number, availableRounds: Number } <br />
-⬆ wordChoosen => word: string <br />
-⬇ wordChoosen => word: string `NOT` `Turn Priviledges` # word is hidden <br />
 ⬆ WordHintRequested => index: Number => { letter: char } <br />
 ⬇ drawTimerStarted => undefined <br />
 ⬇ drawTimerUpdated => timeLeft: number # in seconds <br />
